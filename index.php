@@ -2,8 +2,8 @@
 $brand = [
     'name' => 'Nashmi',
     'tagline' => 'Roadside help that gets you moving again.',
-    'phone' => '(909) 992-6466',
-    'phone_href' => 'tel:9099926466',
+    'phone' => '(949) 444-7443',
+    'phone_href' => 'tel:9494447443',
     'email' => 'nashmiroad@gmail.com',
     'email_href' => 'mailto:nashmiroad@gmail.com',
     'address' => 'Nashmi Roadside Assistance LLC, Butterfield Ranch Rd, Chino Hills, CA 91709, United States',
@@ -62,40 +62,49 @@ $reviews = [
     ],
 ];
 
-$cities = [
-    'Chino',
-    'Norco',
-    'Corona',
-    'Irvine',
-    'Orange',
-    'Pomona',
-    'Upland',
-    'Ontario',
-    'Eastvale',
-    'Montclair',
-    'Riverside',
-    'Costa Mesa',
-    'Chino Hills',
-    'Diamond Bar',
-    'Yorba Linda',
-    'Laguna Beach',
-    'Jurupa Valley',
-    'Orange County',
-    'La Verne',
-    'Rancho Cucamonga',
-    'Newport Beach',
-    'Lake Forest',
-    'Long Beach',
-    'Anaheim',
-    'Anaheim Hills',
-    'Santa Ana',
-    'Garden Grove',
-    'Westminster',
-    'Huntington Beach',
-    'Placentia',
-    'Tustin',
-    'Cypress',
-    'Fullerton',
+$serviceAreas = [
+    'Orange County' => [
+        'Irvine',
+        'Anaheim',
+        'Santa Ana',
+        'Huntington Beach',
+        'Newport Beach',
+        'Costa Mesa',
+        'Garden Grove',
+        'Fullerton',
+        'Orange',
+        'Tustin',
+        'Mission Viejo',
+        'Lake Forest',
+        'Aliso Viejo',
+        'Laguna Niguel',
+        'Dana Point',
+        'San Clemente',
+        'Yorba Linda',
+        'Brea',
+        'Fountain Valley',
+        'Westminster',
+    ],
+    'Inland Empire' => [
+        'Riverside',
+        'San Bernardino',
+        'Ontario',
+        'Rancho Cucamonga',
+        'Fontana',
+        'Moreno Valley',
+        'Corona',
+        'Victorville',
+        'Rialto',
+        'Hesperia',
+        'Chino',
+        'Chino Hills',
+        'Redlands',
+        'Colton',
+        'Upland',
+        'Jurupa Valley',
+        'Perris',
+        'Temecula',
+    ],
 ];
 
 $formStatus = null;
@@ -219,13 +228,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/style.css?v=20">
+    <link rel="stylesheet" href="assets/style.css?v=26">
 </head>
 <body>
     <header class="site-header" id="header">
         <div class="container header-inner">
             <a class="brand" href="#home" aria-label="<?= htmlspecialchars($brand['name']) ?>">
                 <span class="brand-mark"><img src="<?= htmlspecialchars($brand['mark']) ?>" alt="" aria-hidden="true"></span>
+                <span class="brand-word">ashmi</span>
             </a>
             <nav class="nav" id="nav" aria-label="Main navigation">
                 <a href="#services">Services</a>
@@ -242,12 +252,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <main>
         <section class="hero" id="home">
-            <div class="hero-slider" aria-hidden="true">
+            <div class="hero-slider">
                 <?php foreach ($heroSlides as $index => $slide): ?>
                     <img
                         class="hero-slide <?= $index === 0 ? 'active' : '' ?>"
                         src="<?= htmlspecialchars($slide['image']) ?>"
-                        alt=""
+                        alt="<?= htmlspecialchars($slide['title']) ?>"
                         <?= $index === 0 ? 'fetchpriority="high"' : 'loading="lazy"' ?>
                         data-hero-slide
                     >
@@ -256,25 +266,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="hero-shade"></div>
             <div class="container hero-content">
                 <div class="hero-copy">
-                    <div class="hero-badge"><i class="fa-solid fa-shield-halved"></i> Roadside Assistance - <?= htmlspecialchars($brand['area']) ?></div>
-                    <h1><?= htmlspecialchars($brand['tagline']) ?></h1>
+                    <div class="hero-badge"><i class="fa-solid fa-shield-halved"></i> Roadside Assistance - California</div>
+                    <h1>Roadside help that gets you moving again.</h1>
                     <p>When car trouble interrupts your day, Nashmi keeps the next step simple: send your location, choose the service, and get connected with the fastest roadside support.</p>
+                    <div class="hero-service-note"><i class="fa-solid fa-clock"></i> 24/7 Roadside Assistance &mdash; Orange County &amp; Inland Empire</div>
                     <div class="hero-actions">
                         <a class="btn btn-primary" href="#request">Request Help Now</a>
-                        <a class="btn btn-ghost" href="<?= htmlspecialchars($brand['phone_href']) ?>"><i class="fa-solid fa-phone-volume"></i><?= htmlspecialchars($brand['phone']) ?></a>
+                        <a class="btn btn-ghost" href="<?= htmlspecialchars($brand['phone_href']) ?>"><i class="fa-solid fa-phone"></i><?= htmlspecialchars($brand['phone']) ?></a>
+                        <a class="btn btn-ghost wide" href="#request" data-service="Battery Replacement (on-site)"><i class="fa-solid fa-car-battery"></i>Schedule Battery Replacement</a>
                     </div>
                 </div>
                 <img class="hero-logo" src="<?= htmlspecialchars($brand['logo']) ?>" alt="<?= htmlspecialchars($brand['name']) ?> Roadside Assistance LLC" fetchpriority="high">
             </div>
-            <a class="scroll-cue" href="#services">See services <i class="fa-solid fa-chevron-down"></i></a>
+            <a class="scroll-cue" href="#services">See what we do <i class="fa-solid fa-chevron-down"></i></a>
         </section>
 
         <section class="section services" id="services">
             <div class="container">
-                <div class="section-head">
-                    <span>What We Do</span>
-                    <h2>Practical help for common roadside problems</h2>
-                    <p>Choose the service you need. Battery replacement can be booked for a specific date and time.</p>
+                <div class="center-head">
+                    <h2>Our Services</h2>
+                    <p>Explore our selection of reliable roadside assistance services.</p>
                 </div>
                 <div class="services-grid">
                     <?php foreach ($services as $service): ?>
@@ -293,7 +304,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <a class="service-action <?= !empty($service['book']) ? 'book-action' : '' ?>" href="#request" data-service="<?= htmlspecialchars($service['value']) ?>">
                                         <?= !empty($service['book']) ? 'Book Now' : 'Request Help' ?>
                                     </a>
-                                    <a class="service-call" href="<?= htmlspecialchars($brand['phone_href']) ?>" aria-label="Call <?= htmlspecialchars($brand['phone']) ?>"><i class="fa-solid fa-phone"></i> Call</a>
+                                    <a class="service-call" href="<?= htmlspecialchars($brand['phone_href']) ?>" aria-label="Call <?= htmlspecialchars($brand['phone']) ?>"><i class="fa-solid fa-phone"></i>Call</a>
                                 </div>
                             </div>
                         </article>
@@ -304,9 +315,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <section class="section process" id="process">
             <div class="container">
-                <div class="section-head">
-                    <span>The Process</span>
+                <div class="center-head">
                     <h2>A clear path from request to arrival</h2>
+                    <p>Simple steps, direct communication, and the details we need to reach you quickly.</p>
                 </div>
                 <div class="steps">
                     <?php foreach ($steps as $step): ?>
@@ -322,10 +333,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <section class="section reviews" id="reviews">
             <div class="container">
-                <div class="section-head">
-                    <span>Customer Trust</span>
+                <div class="center-head">
                     <h2>Customers value calm, direct service</h2>
-                    <div class="rating">Customer feedback</div>
                 </div>
                 <div class="reviews-grid">
                     <?php foreach ($reviews as $reviewGroup): ?>
@@ -351,16 +360,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </section>
 
-        <section class="section service-area">
+        <section class="section service-area" id="areas">
             <div class="container">
-                <div class="section-head">
-                    <span>Service Area</span>
-                    <h2>Serving California drivers</h2>
-                    <p>Service is focused on California customers only. Share your GPS location so the team can confirm availability and arrival time.</p>
+                <div class="center-head">
+                    <span class="eyebrow">Service Area</span>
+                    <h2>Serving Orange County &amp; the Inland Empire</h2>
+                    <p>From the coast of Orange County to the cities of the Inland Empire - wherever you're stranded, we're on the way.</p>
                 </div>
-                <div class="cities">
-                    <?php foreach ($cities as $city): ?>
-                        <span><?= htmlspecialchars($city) ?></span>
+                <div class="area-list">
+                    <?php foreach ($serviceAreas as $county => $cities): ?>
+                        <section class="area-group">
+                            <h3><?= htmlspecialchars($county) ?></h3>
+                            <div class="cities">
+                                <?php foreach ($cities as $city): ?>
+                                    <span><?= htmlspecialchars($city) ?></span>
+                                <?php endforeach; ?>
+                            </div>
+                        </section>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -369,7 +385,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <section class="request" id="request">
             <div class="container request-grid">
                 <aside class="request-info">
-                    <span>Get Assistance</span>
+                    <span>Contact Nashmi</span>
                     <h2>Send the details and stay by your phone.</h2>
                     <p>Use the form to share the basics. For battery replacement, choose the appointment date and time that works for you.</p>
                     <a class="contact-line" href="<?= htmlspecialchars($brand['phone_href']) ?>"><i class="fa-solid fa-phone"></i><strong><?= htmlspecialchars($brand['phone']) ?></strong></a>
@@ -488,9 +504,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="footer-bottom">&copy; <?= date('Y') ?> <?= htmlspecialchars($brand['name']) ?>. All rights reserved.</div>
     </footer>
 
-    <div class="mobile-cta">
-        <a href="<?= htmlspecialchars($brand['phone_href']) ?>"><i class="fa-solid fa-phone"></i> Call Now</a>
-        <a href="#request">Request Help</a>
+    <div class="mobile-cta" aria-label="Quick contact actions">
+        <a class="mobile-cta-call" href="<?= htmlspecialchars($brand['phone_href']) ?>"><i class="fa-solid fa-phone"></i> Call Now</a>
+        <a class="mobile-cta-help" href="#request">Request Help</a>
     </div>
 
     <div class="email-modal" id="emailModal" hidden>
@@ -508,6 +524,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
-    <script src="assets/script.js?v=13"></script>
+    <script src="assets/script.js?v=14"></script>
 </body>
 </html>
