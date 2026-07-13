@@ -2073,7 +2073,8 @@ body.email-modal-open {
 
 @media (max-width: 680px) {
     body {
-        padding-bottom: calc(60px + env(safe-area-inset-bottom)); 
+        padding-bottom: calc(45px + env(safe-area-inset-bottom)); 
+        background: #000000; 
         
     }
     
@@ -2089,24 +2090,19 @@ body.email-modal-open {
         padding-bottom: env(safe-area-inset-bottom);
         background: #000000;
         border-top: 1px solid rgba(255, 255, 255, 0.12);
-        box-shadow: 0 -14px 34px rgba(0, 0, 0, 0.4);
+        box-shadow: none;
     }
 
     .mobile-cta a {
         display: inline-flex;
         align-items: center;
-        min-height: 44px;
         justify-content: center;
-        gap: 8px; 
-        min-width: 0;
-        min-height: 45px;
-        padding: 0 12px;
+        gap: 10px; 
+        min-height: 45px; 
+        padding: 0 15px;
         color: #fff;
-        font-size: 0.82rem; 
+        font-size: 0.95rem; 
         font-weight: 900;
-        line-height: 1.1;
-        text-align: center;
-        white-space: nowrap;
     }
 
     .mobile-cta-call {
