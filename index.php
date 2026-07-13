@@ -2,8 +2,8 @@
 $brand = [
     'name' => 'Nashmi',
     'tagline' => 'Roadside help that gets you moving again.',
-    'phone' => '(949) 444-7443',
-    'phone_href' => 'tel:9494447443',
+    'phone' => '(909) 992-64663',
+    'phone_href' => 'tel:90999264663',
     'email' => 'nashmiroad@gmail.com',
     'email_href' => 'mailto:nashmiroad@gmail.com',
     'address' => 'Nashmi Roadside Assistance LLC, Butterfield Ranch Rd, Chino Hills, CA 91709, United States',
@@ -102,7 +102,6 @@ $serviceAreas = [
     'Los Angeles County' => [
         'Diamond Bar',
         'La Verne',
-        'Long Beach',
         'Pomona',
     ],
 ];
