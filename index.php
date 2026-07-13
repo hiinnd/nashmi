@@ -269,7 +269,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="hero-badge"><i class="fa-solid fa-shield-halved"></i> Roadside Assistance - California</div>
                     <h1>Roadside help that gets you moving again.</h1>
                     <p>When car trouble interrupts your day, Nashmi keeps the next step simple: send your location, choose the service, and get connected with the fastest roadside support.</p>
-                    <div class="hero-service-note"><i class="fa-solid fa-clock"></i> 24/7 Roadside Assistance &mdash; Orange County &amp; Inland Empire</div>
+                    <div class="hero-service-note"><i class="fa-solid fa-clock"></i> 24/7 Roadside Assistance &mdash; ORANGE COUNTY &amp; NLAND EMPIRE &amp; LOS ANGELES COUNTY</div>
                     <div class="hero-actions">
                         <a class="btn btn-primary" href="#request">Request Help Now</a>
                         <a class="btn btn-ghost" href="<?= htmlspecialchars($brand['phone_href']) ?>"><i class="fa-solid fa-phone"></i><?= htmlspecialchars($brand['phone']) ?></a>
@@ -364,7 +364,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="container">
                 <div class="center-head">
                     <span class="eyebrow">Service Area</span>
-                    <h2>Serving Orange County, San Bernardino, Riverside &amp; Los Angeles</h2>
+                    <h2>Serving </h2>
+                    <h2> • Orange County   • INLAND EMPIRE </h2> <h2>  • LOS ANGELES COUNTY</h2>
                     <p>From Orange County to nearby Inland Empire and Los Angeles County cities - wherever you're stranded, we're on the way.</p>
                 </div>
                 <div class="area-list">
@@ -397,7 +398,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a class="contact-line" href="<?= htmlspecialchars($brand['maps_href']) ?>" target="_blank" rel="noopener"><i class="fa-solid fa-location-dot"></i><strong><?= htmlspecialchars($brand['address']) ?></strong></a>
                     <div class="badges">
                         <span><i class="fa-solid fa-clock"></i> 24/7 Availability</span>
-                        <span><i class="fa-solid fa-location-crosshairs"></i> GPS Location</span>
+                        <span><i class="fa-solid fa-shield-halved"></i> Trusted Teches</span>
+                        <span><i class="fa-solid fa-location-crosshairs"></i>  GPS Location</span>
                         <span><i class="fa-solid fa-lock"></i> Private Request</span>
                     </div>
                 </aside>
@@ -412,58 +414,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php endif; ?>
 
                     <form method="post" action="#request" id="helpForm" novalidate>
-                        <input type="text" name="website" tabindex="-1" autocomplete="off" class="honeypot" aria-hidden="true">
-                        <div class="form-row">
-                            <label for="fname">Full Name <span>*</span><input type="text" id="fname" name="name" placeholder="John Smith" required autocomplete="name"></label>
-                            <label for="phone">Phone Number <span>*</span><input type="tel" id="phone" name="phone" placeholder="(555) 000-0000" maxlength="14" pattern="\([0-9]{3}\) [0-9]{3}-[0-9]{4}" required autocomplete="tel"></label>
-                        </div>
-                        <label for="email">Email Address<input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email"></label>
-                        <div class="form-row three">
-                            <label for="year">Year <span>*</span><select name="vehicle_year" id="year" required><option value="">Year</option></select></label>
-                            <label for="make">Make <span>*</span><select name="vehicle_make" id="make" required><option value="">Make</option></select></label>
-                            <label for="model">Model <span>*</span><select name="vehicle_model" id="model" required><option value="">Select make first</option></select></label>
-                        </div>
-                        <label for="vin">VIN Number <strong>(optional)</strong>
-                            <input type="text" id="vin" name="vin" placeholder="E.G. 1HGBH41JXMN109186" maxlength="17" autocomplete="off">
-                            <small class="field-hint">17-character Vehicle Identification Number - helps us look up your exact vehicle.</small>
-                        </label>
-                        <label for="service">Service Needed <span>*</span>
-                            <select name="service" id="service" required>
-                                <option value="">What do you need help with?</option>
-                                <?php foreach ($services as $service): ?>
-                                    <option value="<?= htmlspecialchars($service['value']) ?>"><?= htmlspecialchars($service['value']) ?></option>
-                                <?php endforeach; ?>
-                                <option value="Other">Other - I'll describe below</option>
-                            </select>
-                        </label>
-                        <div class="appointment-fields" id="appointmentFields" hidden>
-                            <div class="appointment-head">
-                                <i class="fa-solid fa-calendar-check"></i>
-                                <div>
-                                    <strong>Battery Replacement Appointment</strong>
-                                    <small>Choose the day and time for on-site installation.</small>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <label for="appointmentDate">Appointment Date <span>*</span><input type="date" id="appointmentDate" name="appointment_date"></label>
-                                <label for="appointmentTime">Appointment Time <span>*</span><input type="time" id="appointmentTime" name="appointment_time"></label>
-                            </div>
-                        </div>
-                        <label for="location">Street Address / Current Location <span>*</span>
-                            <div class="location-field">
-                                <input type="text" name="location" id="location" placeholder="Street address, cross street, or landmark" required autocomplete="street-address">
-                                <button type="button" id="gpsBtn" aria-label="Use my current location"><i class="fa-solid fa-location-crosshairs"></i></button>
-                            </div>
-                            <input type="hidden" name="latitude" id="latitude">
-                            <input type="hidden" name="longitude" id="longitude">
-                            <input type="hidden" name="location_accuracy" id="locationAccuracy">
-                            <input type="hidden" name="maps_url" id="mapsUrl">
-                            <small id="gpsStatus"></small>
-                        </label>
-                        <label for="notes">Additional Details<textarea name="notes" id="notes" rows="4" placeholder="Highway exit number, nearby landmarks, anything else that'll help us find you faster..."></textarea></label>
-                        <button class="btn submit-btn" type="submit" id="submitBtn"><i class="fa-solid fa-paper-plane"></i> Send Request</button>
-                        <p class="form-disclaimer"><i class="fa-solid fa-lock"></i> We'll call you within minutes. Your info is never shared.</p>
-                    </form>
+    <input type="text" name="website" tabindex="-1" autocomplete="off" class="honeypot" aria-hidden="true">
+    
+    <!-- قسم المعلومات الشخصية -->
+    <div class="form-row">
+        <label for="fname">Full Name <span>*</span><input type="text" id="fname" name="name" placeholder="John Smith" required autocomplete="name"></label>
+        <label for="phone">Phone Number <span>*</span><input type="tel" id="phone" name="phone" placeholder="(555) 000-0000" maxlength="14" pattern="\([0-9]{3}\) [0-9]{3}-[0-9]{4}" required autocomplete="tel"></label>
+    </div>
+    <label for="email">Email Address<input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email"></label>
+
+    <!-- قسم معلومات السيارة -->
+    <h3>Car Information</h3>
+    <div class="form-row three">
+        <label for="make">Make <span>*</span><select name="vehicle_make" id="make" required><option value="">Make</option></select></label>
+        <label for="model">Model <span>*</span><select name="vehicle_model" id="model" required><option value="">Select make first</option></select></label>
+        <label for="year">Year <span>*</span><select name="vehicle_year" id="year" required><option value="">Year</option></select></label>
+    </div>
+    
+    <label for="vin">VIN Number <strong>(optional)</strong>
+        <input type="text" id="vin" name="vin" placeholder="E.G. 1HGBH41JXMN109186" maxlength="17" autocomplete="off">
+        <small class="field-hint">17-character Vehicle Identification Number - helps us look up your exact vehicle.</small>
+    </label>
+
+    <!-- باقي الفورم -->
+    <label for="service">Service Needed <span>*</span>
+        <select name="service" id="service" required>
+            <option value="">What do you need help with?</option>
+            <?php foreach ($services as $service): ?>
+                <option value="<?= htmlspecialchars($service['value']) ?>"><?= htmlspecialchars($service['value']) ?></option>
+            <?php endforeach; ?>
+            <option value="Other">Other - I'll describe below</option>
+        </select>
+    </label>
+
+    <div class="appointment-fields" id="appointmentFields" hidden>
+        <div class="appointment-head">
+            <i class="fa-solid fa-calendar-check"></i>
+            <div>
+                <strong>Battery Replacement Appointment</strong>
+                <small>Choose the day and time for on-site installation.</small>
+            </div>
+        </div>
+        <div class="form-row">
+            <label for="appointmentDate">Appointment Date <span>*</span><input type="date" id="appointmentDate" name="appointment_date"></label>
+            <label for="appointmentTime">Appointment Time <span>*</span><input type="time" id="appointmentTime" name="appointment_time"></label>
+        </div>
+    </div>
+
+    <label for="location">Street Address / Current Location <span>*</span>
+        <div class="location-field">
+            <input type="text" name="location" id="location" placeholder="Street address, cross street, or landmark" required autocomplete="street-address">
+            <button type="button" id="gpsBtn" aria-label="Use my current location"><i class="fa-solid fa-location-crosshairs"></i></button>
+        </div>
+        <input type="hidden" name="latitude" id="latitude">
+        <input type="hidden" name="longitude" id="longitude">
+        <input type="hidden" name="location_accuracy" id="locationAccuracy">
+        <input type="hidden" name="maps_url" id="mapsUrl">
+        <small id="gpsStatus"></small>
+    </label>
+    <label for="notes">Additional Details<textarea name="notes" id="notes" rows="4" placeholder="Highway exit number, nearby landmarks, anything else that'll help us find you faster..."></textarea></label>
+    <button class="btn submit-btn" type="submit" id="submitBtn"><i class="fa-solid fa-paper-plane"></i> Send Request</button>
+    <p class="form-disclaimer"><i class="fa-solid fa-lock"></i> We'll call you within minutes. Your info is never shared.</p>
+</form>
                 </div>
             </div>
         </section>
