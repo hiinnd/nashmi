@@ -950,15 +950,18 @@ textarea:focus {
     color: var(--accent);
 }
 
-body.email-modal-open {
+body.email-modal-open,
+body.request-success-modal-open {
     overflow: hidden;
 }
 
-.email-modal[hidden] {
+.email-modal[hidden],
+.request-success-modal[hidden] {
     display: none;
 }
 
-.email-modal {
+.email-modal,
+.request-success-modal {
     position: fixed;
     inset: 0;
     z-index: 100;
@@ -967,7 +970,8 @@ body.email-modal-open {
     padding: 20px;
 }
 
-.email-modal-backdrop {
+.email-modal-backdrop,
+.request-success-backdrop {
     position: absolute;
     inset: 0;
     border: 0;
@@ -976,7 +980,8 @@ body.email-modal-open {
     cursor: pointer;
 }
 
-.email-modal-card {
+.email-modal-card,
+.request-success-card {
     position: relative;
     z-index: 1;
     width: min(420px, 100%);
@@ -987,7 +992,8 @@ body.email-modal-open {
     box-shadow: 0 30px 90px rgba(0, 0, 0, 0.28);
 }
 
-.email-modal-close {
+.email-modal-close,
+.request-success-close {
     position: absolute;
     top: 14px;
     right: 14px;
@@ -1002,7 +1008,8 @@ body.email-modal-open {
     cursor: pointer;
 }
 
-.email-modal-icon {
+.email-modal-icon,
+.request-success-icon {
     width: 56px;
     height: 56px;
     display: grid;
@@ -1012,17 +1019,28 @@ body.email-modal-open {
     background: var(--accent);
 }
 
-.email-modal-card h2 {
+.request-success-icon {
+    background: #128341;
+}
+
+.email-modal-card h2,
+.request-success-card h2 {
     margin: 18px 44px 6px 0;
     font-size: 1.45rem;
     line-height: 1.2;
 }
 
-.email-modal-card p {
+.email-modal-card p,
+.request-success-card p {
     margin: 0 0 20px;
     color: var(--muted);
     font-weight: 700;
     overflow-wrap: anywhere;
+}
+
+.request-success-action {
+    width: 100%;
+    min-height: 52px;
 }
 
 .email-modal-options {
@@ -1536,6 +1554,19 @@ body.email-modal-open {
     .brand-word {
         font-size: 1.08rem;
     }
+
+    .hero-service-note {
+        padding: 8px 12px;
+        column-gap: 8px;
+    }
+
+    .hero-service-note .main-text {
+        font-size: 0.76rem;
+    }
+
+    .hero-service-note .sub-text {
+        font-size: 0.68rem;
+    }
 }
 
 /* Client-requested final homepage polish. */
@@ -1906,20 +1937,47 @@ body.email-modal-open {
 .hero-service-note {
     width: min(790px, 100%);
     min-height: 54px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    column-gap: 12px;
+    row-gap: 2px;
     justify-content: flex-start;
-    padding: 0 28px;
+    padding: 8px 28px;
     border: 2px solid rgba(255, 255, 255, 0.22);
     border-radius: 999px;
     color: #fff;
     background: rgba(0, 0, 0, 0.42);
     box-shadow: inset 0 0 0 1px rgba(223, 31, 45, 0.16);
-    font-size: clamp(0.94rem, 1.7vw, 1.22rem);
-    letter-spacing: 0.04em;
+    letter-spacing: 0;
     text-transform: uppercase;
 }
 
 .hero-service-note i {
+    grid-column: 1;
+    grid-row: 1;
     color: var(--accent);
+    margin-top: 4px;
+    font-size: 1rem;
+}
+
+.hero-service-note .note-content {
+    grid-column: 2;
+    min-width: 0;
+    display: grid;
+    gap: 2px;
+}
+
+.hero-service-note .main-text {
+    font-size: 1.05rem;
+    line-height: 1.18;
+    white-space: nowrap;
+}
+
+.hero-service-note .sub-text {
+    font-size: 0.94rem;
+    line-height: 1.22;
+    overflow-wrap: anywhere;
 }
 
 .hero-actions {
@@ -2080,9 +2138,25 @@ body.email-modal-open {
 
 @media (max-width: 680px) {
     .hero-service-note {
-        justify-content: center;
-        padding: 0 18px;
-        text-align: center;
+        width: 100%;
+        min-height: 0;
+        justify-content: stretch;
+        column-gap: 9px;
+        padding: 9px 16px;
+        text-align: left;
+    }
+
+    .hero-service-note i {
+        margin-top: 2px;
+        font-size: 0.88rem;
+    }
+
+    .hero-service-note .main-text {
+        font-size: 0.82rem;
+    }
+
+    .hero-service-note .sub-text {
+        font-size: 0.74rem;
     }
 
     .service-body {
@@ -2149,5 +2223,20 @@ body.email-modal-open {
         gap: 7px;
         padding: 0 10px;
         font-size: 0.60rem;
+    }
+}
+
+@media (max-width: 390px) {
+    .hero-service-note {
+        padding: 8px 12px;
+        column-gap: 8px;
+    }
+
+    .hero-service-note .main-text {
+        font-size: 0.76rem;
+    }
+
+    .hero-service-note .sub-text {
+        font-size: 0.68rem;
     }
 }

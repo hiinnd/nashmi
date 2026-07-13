@@ -1,11 +1,53 @@
 <?php
+function loadEnvFile(string $path): void
+{
+    if (!is_readable($path)) {
+        return;
+    }
+
+    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    if (!$lines) {
+        return;
+    }
+
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if ($line === '' || strpos($line, '#') === 0 || strpos($line, '=') === false) {
+            continue;
+        }
+
+        [$key, $value] = array_map('trim', explode('=', $line, 2));
+        $value = trim($value, "\"'");
+        if ($key !== '' && getenv($key) === false) {
+            putenv($key . '=' . $value);
+            $_ENV[$key] = $value;
+        }
+    }
+}
+
+function isDebugEnabled(): bool
+{
+    return in_array(strtolower((string) getenv('APP_DEBUG')), ['1', 'true', 'yes', 'on'], true);
+}
+
+loadEnvFile(__DIR__ . DIRECTORY_SEPARATOR . '.env');
+
+if (isDebugEnabled()) {
+    ini_set('display_errors', '1');
+    ini_set('display_startup_errors', '1');
+    error_reporting(E_ALL);
+}
+
 $brand = [
     'name' => 'Nashmi',
     'tagline' => 'Roadside help that gets you moving again.',
     'phone' => '(909) 992-6466',
     'phone_href' => 'tel:9099926466',
+    'sms_to' => '+19099926466',
     'email' => 'nashmiroad@gmail.com',
+    'mail_from' => 'noreply@nashmi-road.com',
     'email_href' => 'mailto:nashmiroad@gmail.com',
+    'website_url' => 'https://www.nashmi-road.com/',
     'address' => 'Nashmi Roadside Assistance LLC, Butterfield Ranch Rd, Chino Hills, CA 91709, United States',
     'area' => 'California',
     'mark' => 'assets/images/n-mark-transparent.png',
@@ -154,13 +196,152 @@ function buildRequestEmail(array $submission, array $brand): string
         $submission['notes'] ?: 'No additional notes.',
         '',
         'Submitted at: ' . $submission['created_at'],
-        'Website: ' . $brand['name'],
+        'Website: ' . $brand['website_url'],
     ];
 
     return implode(PHP_EOL, $lines);
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+function buildRequestSms(array $submission): string
+{
+    $lines = [
+        'New Nashmi Request',
+        'Name: ' . ($submission['name'] ?: 'Not provided'),
+        'Phone: ' . ($submission['phone'] ?: 'Not provided'),
+        'Email: ' . ($submission['email'] ?: 'Not provided'),
+        'Vehicle: ' . ($submission['vehicle'] ?: 'Not provided'),
+        'VIN: ' . ($submission['vin'] ?: 'Not provided'),
+        'Service: ' . ($submission['service'] ?: 'Not provided'),
+        'Appointment: ' . trim(($submission['appointment_date'] ?: 'Not selected') . ' ' . ($submission['appointment_time'] ?: '')),
+        'Location: ' . ($submission['location'] ?: 'Not provided'),
+        'Maps: ' . ($submission['maps_url'] ?: 'Not provided'),
+        'Notes: ' . ($submission['notes'] ?: 'No additional notes.'),
+    ];
+
+    return implode("\n", $lines);
+}
+
+function sendEmailNotification(array $submission, array $brand): array
+{
+    $customerEmail = filter_var($submission['email'], FILTER_VALIDATE_EMAIL) ? cleanMailValue($submission['email']) : $brand['email'];
+    $customerName = cleanMailValue($submission['name'] ?: 'Nashmi Customer');
+    $subjectService = cleanMailValue($submission['service'] ?: 'Roadside Assistance');
+    $subjectName = cleanMailValue($submission['name'] ?: 'New Customer');
+    $mailSubject = 'New Nashmi Request - ' . $subjectService . ' - ' . $subjectName;
+    $mailBody = buildRequestEmail($submission, $brand);
+    $mailHeaders = [
+        'MIME-Version: 1.0',
+        'Content-Type: text/plain; charset=UTF-8',
+        'From: ' . cleanMailValue($brand['name']) . ' Website <' . cleanMailValue($brand['mail_from']) . '>',
+        'Reply-To: ' . $customerName . ' <' . $customerEmail . '>',
+        'X-Mailer: PHP/' . phpversion(),
+    ];
+
+    $sent = mail($brand['email'], $mailSubject, $mailBody, implode("\r\n", $mailHeaders));
+
+    if (!$sent) {
+        $lastError = error_get_last();
+        logDeliveryIssue('email', [
+            'to' => $brand['email'],
+            'from' => $brand['mail_from'],
+            'subject' => $mailSubject,
+            'error' => $lastError['message'] ?? 'PHP mail() returned false.',
+        ]);
+    }
+
+    return [
+        'sent' => $sent,
+        'to' => $brand['email'],
+        'error' => $sent ? '' : 'PHP mail() returned false.',
+    ];
+}
+
+function logDeliveryIssue(string $channel, array $context): void
+{
+    $storage = __DIR__ . DIRECTORY_SEPARATOR . 'storage';
+    if (!is_dir($storage)) {
+        mkdir($storage, 0775, true);
+    }
+
+    unset($context['auth_token'], $context['account_sid']);
+    $entry = [
+        'time' => date('c'),
+        'channel' => $channel,
+        'context' => $context,
+    ];
+
+    file_put_contents($storage . DIRECTORY_SEPARATOR . 'delivery.log', json_encode($entry, JSON_UNESCAPED_SLASHES) . PHP_EOL, FILE_APPEND | LOCK_EX);
+}
+
+function sendSmsNotification(string $to, string $message): array
+{
+    try {
+        $accountSid = getenv('TWILIO_ACCOUNT_SID') ?: '';
+        $authToken = getenv('TWILIO_AUTH_TOKEN') ?: '';
+        $fromNumber = getenv('TWILIO_FROM_NUMBER') ?: '';
+
+        if (!$accountSid || !$authToken || !$fromNumber) {
+            $result = ['sent' => false, 'configured' => false, 'error' => 'SMS provider is not configured.'];
+            logDeliveryIssue('sms', ['to' => $to, 'from_configured' => (bool) $fromNumber, 'error' => $result['error']]);
+            return $result;
+        }
+
+        if (!function_exists('curl_init')) {
+            $result = ['sent' => false, 'configured' => true, 'error' => 'PHP cURL extension is not enabled.'];
+            logDeliveryIssue('sms', ['to' => $to, 'from' => $fromNumber, 'error' => $result['error']]);
+            return $result;
+        }
+
+        $ch = curl_init('https://api.twilio.com/2010-04-01/Accounts/' . rawurlencode($accountSid) . '/Messages.json');
+        if ($ch === false) {
+            throw new RuntimeException('Could not initialize cURL.');
+        }
+
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => http_build_query([
+                'From' => $fromNumber,
+                'To' => $to,
+                'Body' => $message,
+            ]),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_USERPWD => $accountSid . ':' . $authToken,
+            CURLOPT_TIMEOUT => 15,
+        ]);
+
+        $response = curl_exec($ch);
+        $statusCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+
+        $decoded = is_string($response) ? json_decode($response, true) : null;
+        $sent = $response !== false && $statusCode >= 200 && $statusCode < 300;
+        $error = $curlError ?: ($decoded['message'] ?? ($response ?: 'SMS provider rejected the request.'));
+
+        if (!$sent) {
+            logDeliveryIssue('sms', [
+                'to' => $to,
+                'from' => $fromNumber,
+                'status_code' => $statusCode,
+                'twilio_code' => $decoded['code'] ?? null,
+                'error' => $error,
+            ]);
+        }
+
+        return [
+            'sent' => $sent,
+            'configured' => true,
+            'status_code' => $statusCode,
+            'message_sid' => $decoded['sid'] ?? null,
+            'error' => $sent ? '' : $error,
+        ];
+    } catch (Throwable $e) {
+        logDeliveryIssue('sms', ['to' => $to, 'error' => $e->getMessage()]);
+        return ['sent' => false, 'configured' => true, 'error' => $e->getMessage()];
+    }
+}
+
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     $required = ['name', 'phone', 'vehicle_year', 'vehicle_make', 'vehicle_model', 'service', 'location'];
     foreach ($required as $field) {
         if (empty(trim($_POST[$field] ?? ''))) {
@@ -202,22 +383,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         file_put_contents($storage . DIRECTORY_SEPARATOR . 'requests.jsonl', json_encode($submission, JSON_UNESCAPED_SLASHES) . PHP_EOL, FILE_APPEND | LOCK_EX);
 
-        $customerEmail = filter_var($submission['email'], FILTER_VALIDATE_EMAIL) ? cleanMailValue($submission['email']) : $brand['email'];
-        $customerName = cleanMailValue($submission['name'] ?: 'Nashmi Customer');
-        $subjectService = cleanMailValue($submission['service'] ?: 'Roadside Assistance');
-        $subjectName = cleanMailValue($submission['name'] ?: 'New Customer');
-        $mailSubject = 'New Nashmi Request - ' . $subjectService . ' - ' . $subjectName;
-        $mailBody = buildRequestEmail($submission, $brand);
-        $mailHeaders = [
-            'MIME-Version: 1.0',
-            'Content-Type: text/plain; charset=UTF-8',
-            'From: ' . cleanMailValue($brand['name']) . ' Website <' . cleanMailValue($brand['email']) . '>',
-            'Reply-To: ' . $customerName . ' <' . $customerEmail . '>',
-            'X-Mailer: PHP/' . phpversion(),
-        ];
-
-        $mailSent = mail($brand['email'], $mailSubject, $mailBody, implode("\r\n", $mailHeaders));
-        $formStatus = $mailSent ? 'success' : 'email_error';
+        $emailResult = sendEmailNotification($submission, $brand);
+        $smsResult = sendSmsNotification($brand['sms_to'], buildRequestSms($submission));
+        $formStatus = ($emailResult['sent'] && $smsResult['sent']) ? 'success' : 'delivery_error';
     } elseif ($errors) {
         $formStatus = 'error';
     }
@@ -237,7 +405,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/style.css?v=26">
+    <link rel="stylesheet" href="assets/style.css?v=27">
 </head>
 <body>
     <header class="site-header" id="header">
@@ -349,7 +517,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <section class="section reviews" id="reviews">
             <div class="container">
                 <div class="center-head">
-                    <h2>Customers value calm, direct service</h2>
+                    <h2>Trusted by Drivers Across Southern California.</h2>
+                    <h2>What Our Customers Say</h2>
                 </div>
                 <div class="reviews-grid">
                     <?php foreach ($reviews as $reviewGroup): ?>
@@ -420,10 +589,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </aside>
 
                 <div class="form-panel">
-                    <?php if ($formStatus === 'success'): ?>
-                        <div class="alert success">Your request was received. We will contact you within minutes.</div>
-                    <?php elseif ($formStatus === 'email_error'): ?>
-                        <div class="alert error">Your request was saved, but email delivery is not configured on this server. Please call us directly.</div>
+                    <?php if ($formStatus === 'delivery_error'): ?>
+                        <div class="alert error">Your request was saved, but email or text message delivery failed. Please call us directly.</div>
                     <?php elseif ($formStatus === 'error'): ?>
                         <div class="alert error">Please fill in all required fields before sending your request.</div>
                     <?php endif; ?>
@@ -551,6 +718,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
-    <script src="assets/script.js?v=14"></script>
+    <div class="request-success-modal" id="requestSuccessModal" <?= $formStatus === 'success' ? 'data-auto-open="true"' : 'hidden' ?>>
+        <button class="request-success-backdrop" type="button" data-request-success-close aria-label="Close success message"></button>
+        <div class="request-success-card" role="dialog" aria-modal="true" aria-labelledby="requestSuccessTitle">
+            <button class="request-success-close" type="button" data-request-success-close aria-label="Close success message"><i class="fa-solid fa-xmark"></i></button>
+            <div class="request-success-icon"><i class="fa-solid fa-check"></i></div>
+            <h2 id="requestSuccessTitle">Success</h2>
+            <p>Your request was sent to Nashmi by email and text message with the details you entered. We will contact you within minutes.</p>
+            <button class="btn request-success-action" type="button" data-request-success-close>Done</button>
+        </div>
+    </div>
+
+    <script src="assets/script.js?v=15"></script>
 </body>
 </html>

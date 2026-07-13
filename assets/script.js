@@ -20,6 +20,8 @@ const modelSelect = document.getElementById("model");
 const emailToggles = document.querySelectorAll(".email-choice-toggle");
 const emailModal = document.getElementById("emailModal");
 const emailCloseButtons = document.querySelectorAll("[data-email-close]");
+const requestSuccessModal = document.getElementById("requestSuccessModal");
+const requestSuccessCloseButtons = document.querySelectorAll("[data-request-success-close]");
 const heroSlides = document.querySelectorAll("[data-hero-slide]");
 const reviewCards = document.querySelectorAll("[data-review-card]");
 
@@ -231,6 +233,25 @@ function closeEmailModal() {
     setEmailTogglesExpanded(false);
 }
 
+function openRequestSuccessModal() {
+    if (!requestSuccessModal) {
+        return;
+    }
+
+    requestSuccessModal.hidden = false;
+    document.body.classList.add("request-success-modal-open");
+    requestSuccessModal.querySelector(".request-success-action")?.focus();
+}
+
+function closeRequestSuccessModal() {
+    if (!requestSuccessModal || requestSuccessModal.hidden) {
+        return;
+    }
+
+    requestSuccessModal.hidden = true;
+    document.body.classList.remove("request-success-modal-open");
+}
+
 function startHeroSlider() {
     if (heroSlides.length < 2) {
         return;
@@ -302,11 +323,20 @@ emailCloseButtons.forEach((button) => {
     button.addEventListener("click", closeEmailModal);
 });
 
+requestSuccessCloseButtons.forEach((button) => {
+    button.addEventListener("click", closeRequestSuccessModal);
+});
+
 document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
         closeEmailModal();
+        closeRequestSuccessModal();
     }
 });
+
+if (requestSuccessModal?.dataset.autoOpen === "true") {
+    openRequestSuccessModal();
+}
 
 document.querySelectorAll("[data-service]").forEach((button) => {
     button.addEventListener("click", (event) => {
