@@ -2072,7 +2072,7 @@ body.email-modal-open {
 
 @media (max-width: 680px) {
     body {
-        padding-bottom: calc(84px + env(safe-area-inset-bottom));
+        padding-bottom: calc(66px + env(safe-area-inset-bottom));
     }
 
     .mobile-cta {
@@ -2083,7 +2083,7 @@ body.email-modal-open {
     z-index: 90;
     display: grid !important;
     grid-template-columns: 1fr 1fr;
-    min-height: calc(84px + env(safe-area-inset-bottom)); 
+    min-height: calc(66px + env(safe-area-inset-bottom)); 
     padding-bottom: env(safe-area-inset-bottom);
     background: #000000; 
     border-top: 1px solid rgba(255, 255, 255, 0.12);
@@ -2096,11 +2096,11 @@ body.email-modal-open {
     justify-content: center;
     gap: 10px;
     min-width: 0;
-    min-height: 84px; 
+    min-height: 66px; 
     padding: 0 14px;
     color: #fff;
-    font-size: 1.1rem; 
-    font-weight: 900;
+    font-size: 1rem; 
+    font-weight: 800;
     line-height: 1.1;
     text-align: center;
     white-space: nowrap;

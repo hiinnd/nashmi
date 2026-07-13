@@ -64,46 +64,46 @@ $reviews = [
 
 $serviceAreas = [
     'Orange County' => [
-        'Irvine',
         'Anaheim',
-        'Santa Ana',
-        'Huntington Beach',
-        'Newport Beach',
+        'Anaheim Hills',
         'Costa Mesa',
-        'Garden Grove',
+        'Cypress',
         'Fullerton',
-        'Orange',
-        'Tustin',
-        'Mission Viejo',
+        'Garden Grove',
+        'Huntington Beach',
+        'Irvine',
+        'Laguna Beach',
         'Lake Forest',
-        'Aliso Viejo',
-        'Laguna Niguel',
-        'Dana Point',
-        'San Clemente',
-        'Yorba Linda',
-        'Brea',
-        'Fountain Valley',
+        'Long Beach',
+        'Newport Beach',
+        'Orange',
+        'Orange County',
+        'Placentia',
+        'Santa Ana',
+        'Tustin',
         'Westminster',
+        'Yorba Linda',
     ],
-    'Inland Empire' => [
-        'Riverside',
-        'San Bernardino',
-        'Ontario',
-        'Rancho Cucamonga',
-        'Fontana',
-        'Moreno Valley',
-        'Corona',
-        'Victorville',
-        'Rialto',
-        'Hesperia',
+    'San Bernardino County' => [
         'Chino',
         'Chino Hills',
-        'Redlands',
-        'Colton',
+        'Montclair',
+        'Ontario',
+        'Rancho Cucamonga',
         'Upland',
+    ],
+    'Riverside County' => [
+        'Corona',
+        'Eastvale',
         'Jurupa Valley',
-        'Perris',
-        'Temecula',
+        'Norco',
+        'Riverside',
+    ],
+    'Los Angeles County' => [
+        'Diamond Bar',
+        'La Verne',
+        'Long Beach',
+        'Pomona',
     ],
 ];
 
@@ -364,8 +364,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="container">
                 <div class="center-head">
                     <span class="eyebrow">Service Area</span>
-                    <h2>Serving Orange County &amp; the Inland Empire</h2>
-                    <p>From the coast of Orange County to the cities of the Inland Empire - wherever you're stranded, we're on the way.</p>
+                    <h2>Serving Orange County, San Bernardino, Riverside &amp; Los Angeles</h2>
+                    <p>From Orange County to nearby Inland Empire and Los Angeles County cities - wherever you're stranded, we're on the way.</p>
                 </div>
                 <div class="area-list">
                     <?php foreach ($serviceAreas as $county => $cities): ?>
