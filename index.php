@@ -269,7 +269,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="hero-badge"><i class="fa-solid fa-shield-halved"></i> Roadside Assistance - California</div>
                     <h1>Roadside help that gets you moving again.</h1>
                     <p>When car trouble interrupts your day, Nashmi keeps the next step simple: send your location, choose the service, and get connected with the fastest roadside support.</p>
-                    <div class="hero-service-note"><i class="fa-solid fa-clock"></i> 24/7 Roadside Assistance &mdash; ORANGE COUNTY &amp; NLAND EMPIRE &amp; LOS ANGELES COUNTY</div>
+                    <div class="hero-service-note"><i class="fa-solid fa-clock"></i> 24/7 Roadside Assistance  • ORANGE COUNTY • INLAND EMPIRE • LOS ANGELES COUNTY </div>
                     <div class="hero-actions">
                         <a class="btn btn-primary" href="#request">Request Help Now</a>
                         <a class="btn btn-ghost" href="<?= htmlspecialchars($brand['phone_href']) ?>"><i class="fa-solid fa-phone"></i><?= htmlspecialchars($brand['phone']) ?></a>
@@ -365,7 +365,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="center-head">
                     <span class="eyebrow">Service Area</span>
                     <h2>Serving </h2>
-                    <h2> • Orange County   • INLAND EMPIRE </h2> <h2>  • LOS ANGELES COUNTY</h2>
+                    <h3> • ORANGE COUNTY   • INLAND EMPIRE </h3> <h3>  • LOS ANGELES COUNTY</h3>
                     <p>From Orange County to nearby Inland Empire and Los Angeles County cities - wherever you're stranded, we're on the way.</p>
                 </div>
                 <div class="area-list">
