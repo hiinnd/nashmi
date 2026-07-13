@@ -2074,6 +2074,9 @@ body.email-modal-open {
 @media (max-width: 680px) {
     body {
         padding-bottom: calc(60px + env(safe-area-inset-bottom)); 
+        .mobile-cta {
+        min-height: calc(48px + env(safe-area-inset-bottom)); 
+    }
     }
     
     .mobile-cta {
@@ -2097,10 +2100,10 @@ body.email-modal-open {
         justify-content: center;
         gap: 8px; 
         min-width: 0;
-        min-height: 60px; 
-        padding: 0 10px;
+        min-height: 48px;
+        padding: 0 12px;
         color: #fff;
-        font-size: 0.95rem; 
+        font-size: 0.85rem; 
         font-weight: 900;
         line-height: 1.1;
         text-align: center;
