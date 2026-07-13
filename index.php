@@ -2,8 +2,8 @@
 $brand = [
     'name' => 'Nashmi',
     'tagline' => 'Roadside help that gets you moving again.',
-    'phone' => '(909) 992-64663',
-    'phone_href' => 'tel:90999264663',
+    'phone' => '(909) 992-6466',
+    'phone_href' => 'tel:9099926466',
     'email' => 'nashmiroad@gmail.com',
     'email_href' => 'mailto:nashmiroad@gmail.com',
     'address' => 'Nashmi Roadside Assistance LLC, Butterfield Ranch Rd, Chino Hills, CA 91709, United States',
@@ -61,24 +61,29 @@ $reviews = [
         ['name' => 'Rachel P.', 'city' => 'Anaheim, CA', 'text' => 'Helpful team and smooth roadside support. I would use Nashmi again if I needed assistance.'],
     ],
 ];
-
 $serviceAreas = [
     'Orange County' => [
+        'Aliso Viejo',
         'Anaheim',
         'Anaheim Hills',
         'Costa Mesa',
         'Cypress',
+        'Dana Point',
+        'Fountain Valley',
         'Fullerton',
         'Garden Grove',
         'Huntington Beach',
         'Irvine',
         'Laguna Beach',
+        'Laguna Niguel',
         'Lake Forest',
         'Long Beach',
+        'Mission Viejo',
         'Newport Beach',
         'Orange',
         'Orange County',
         'Placentia',
+        'San Clemente',
         'Santa Ana',
         'Tustin',
         'Westminster',
@@ -87,15 +92,18 @@ $serviceAreas = [
     'San Bernardino County' => [
         'Chino',
         'Chino Hills',
+        'Fontana',
         'Montclair',
         'Ontario',
         'Rancho Cucamonga',
+        'San Bernardino',
         'Upland',
     ],
     'Riverside County' => [
         'Corona',
         'Eastvale',
         'Jurupa Valley',
+        'Moreno Valley',
         'Norco',
         'Riverside',
     ],
@@ -103,8 +111,10 @@ $serviceAreas = [
         'Diamond Bar',
         'La Verne',
         'Pomona',
+        'Walnut',
     ],
 ];
+
 
 $formStatus = null;
 $errors = [];
@@ -268,7 +278,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="hero-badge"><i class="fa-solid fa-shield-halved"></i> Roadside Assistance - California</div>
                     <h1>Roadside help that gets you moving again.</h1>
                     <p>When car trouble interrupts your day, Nashmi keeps the next step simple: send your location, choose the service, and get connected with the fastest roadside support.</p>
-                    <div class="hero-service-note"><i class="fa-solid fa-clock"></i> 24/7 Roadside Assistance  • ORANGE COUNTY • INLAND EMPIRE • LOS ANGELES COUNTY </div>
+               <div class="hero-service-note">
+    <i class="fa-solid fa-clock"></i> 
+    <div class="note-content">
+        <span class="main-text">24/7 ROADSIDE ASSISTANCE</span>
+        <span class="sub-text">• ORANGE COUNTY • INLAND EMPIRE • LOS ANGELES COUNTY</span>
+    </div>
+</div>
                     <div class="hero-actions">
                         <a class="btn btn-primary" href="#request">Request Help Now</a>
                         <a class="btn btn-ghost" href="<?= htmlspecialchars($brand['phone_href']) ?>"><i class="fa-solid fa-phone"></i><?= htmlspecialchars($brand['phone']) ?></a>

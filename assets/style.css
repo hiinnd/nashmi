@@ -1599,11 +1599,40 @@ body.email-modal-open {
 
 .hero-service-note {
     display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    margin-top: 20px;
+    align-items: center; 
+    gap: 10px;
+    padding: 10px 20px;
+    margin-top: 15px; 
     color: #fff;
-    font-weight: 900;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    box-shadow: none !important;
+}
+
+.hero-service-note i {
+    font-size: 0.9rem; 
+    color: var(--accent);
+    margin-top: -20px; 
+}
+
+.note-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px; 
+}
+
+.main-text {
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.sub-text {
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
 }
 
 .hero-actions {
