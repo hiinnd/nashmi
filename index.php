@@ -554,11 +554,20 @@ function sendSmsNotification(string $to, string $message): array
     </div>
     
     <label for="vin">VIN Number <strong>(optional)</strong>
-        <input type="text" id="vin" name="vin" placeholder="E.G. 1HGBH41JXMN109186" maxlength="17" autocomplete="off">
-        <small class="field-hint">17-character Vehicle Identification Number - helps us look up your exact vehicle.</small>
+       <input
+    type="text"
+    id="vin"
+    name="vin"
+    placeholder="E.G. 1HGBH41JXMN109186"
+    maxlength="17"
+    minlength="17"
+    pattern="[A-HJ-NPR-Z0-9]{17}"
+    oninput="this.value=this.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g,'').slice(0,17)"
+    autocomplete="off">
+    <small class="field-hint">17-character Vehicle Identification Number - helps us look up your exact vehicle.</small>
     </label>
 
-    <!-- باقي الفورم -->
+    
     <label for="service">Service Needed <span>*</span>
         <select name="service" id="service" required>
             <option value="">What do you need help with?</option>
