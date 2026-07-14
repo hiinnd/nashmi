@@ -546,8 +546,12 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             <div class="container">
                 <div class="center-head">
                     <span class="eyebrow">Service Area</span>
-                    <h2>Serving </h2>
-                    <h3> • ORANGE COUNTY   • INLAND EMPIRE </h3> <h3>  • LOS ANGELES COUNTY</h3>
+                    <h2>Serving</h2>
+                    <div class="service-area-regions" aria-label="Primary service regions">
+                        <span>ORANGE COUNTY</span>
+                        <span>INLAND EMPIRE</span>
+                        <span>LOS ANGELES COUNTY</span>
+                    </div>
                     <p>From Orange County to nearby Inland Empire and Los Angeles County cities - wherever you're stranded, we're on the way.</p>
                 </div>
                 <div class="area-list">
