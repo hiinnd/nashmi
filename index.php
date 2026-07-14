@@ -373,7 +373,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($brand['name']) ?> | Roadside Assistance in California</title>
+    <title>Nashmi Roadside Assistance</title> 
     <meta name="description" content="<?= htmlspecialchars($brand['name']) ?> provides roadside assistance across California: tire change, tire patch, battery jump, battery replacement, lockout, and gas delivery.">
     <meta name="keywords" content="roadside assistance California, mobile battery replacement, tire change, battery jump start, car lockout, fuel delivery">
     <meta name="theme-color" content="#0b0b0d">
