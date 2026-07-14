@@ -1228,7 +1228,7 @@ body.request-success-modal-open {
 
 .service-body {
     width: 100%;
-    min-height: 188px;
+    min-height: 250px; 
     display: flex;
     flex-direction: column;
     padding: 22px;
@@ -1255,7 +1255,7 @@ body.request-success-modal-open {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-top: auto;
+    margin-top: auto; 
 }
 
 .service-action,
