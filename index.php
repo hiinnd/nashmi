@@ -40,7 +40,7 @@ if (isDebugEnabled()) {
 
 $brand = [
     'name' => 'Nashmi',
-    'tagline' => 'Roadside help that gets you moving again.',
+    'tagline' => 'Your Roadside Emergency Ends Here',
     'phone' => '(909) 992-6466',
     'phone_href' => 'tel:9099926466',
     'sms_to' => '+19099926466',
@@ -304,7 +304,14 @@ function sendSmsNotification(string $to, string $message): array
         return ['sent' => false, 'configured' => true, 'error' => $e->getMessage()];
     }
 }
+session_start();
 
+$showSuccessModal = false;
+
+if (!empty($_SESSION['show_success_modal'])) {
+    $showSuccessModal = true;
+    unset($_SESSION['show_success_modal']); // حتى ما يطلع مرة ثانية
+}
 
 ?>
 <!DOCTYPE html>
@@ -324,6 +331,7 @@ function sendSmsNotification(string $to, string $message): array
     <link rel="stylesheet" href="assets/style.css?v=27">
 </head>
 <body>
+    
     <header class="site-header" id="header">
         <div class="container header-inner">
             <a class="brand" href="#home" aria-label="<?= htmlspecialchars($brand['name']) ?>">
@@ -486,9 +494,7 @@ function sendSmsNotification(string $to, string $message): array
                     <span class="eyebrow">Service Area</span>
                     <h2>Serving</h2>
                     <div class="service-area-regions" aria-label="Primary service regions">
-                        <span>ORANGE COUNTY</span>
-                        <span>INLAND EMPIRE</span>
-                        <span>LOS ANGELES COUNTY</span>
+                        <h3><span> • ORANGE COUNTY • INLAND EMPIRE • LOS ANGELES COUNTY </span></h3>
                     </div>
                     <p>From Orange County to nearby Inland Empire and Los Angeles County cities - wherever you're stranded, we're on the way.</p>
                 </div>
@@ -667,7 +673,9 @@ function sendSmsNotification(string $to, string $message): array
         </div>
     </div>
 
-    <div class="request-success-modal" id="requestSuccessModal" <?= $formStatus === 'success' ? 'data-auto-open="true"' : 'hidden' ?>>
+    <div class="request-success-modal"
+     id="requestSuccessModal"
+     <?= $showSuccessModal ? 'data-auto-open="true"' : 'hidden' ?>>
         <button class="request-success-backdrop" type="button" data-request-success-close aria-label="Close success message"></button>
         <div class="request-success-card" role="dialog" aria-modal="true" aria-labelledby="requestSuccessTitle">
             <button class="request-success-close" type="button" data-request-success-close aria-label="Close success message"><i class="fa-solid fa-xmark"></i></button>

@@ -177,14 +177,15 @@ function sendEmailNotification(array $submission, array $brand): array
         $service = cleanHeaderValue($submission['service'] ?: 'Roadside Assistance');
         $name = cleanHeaderValue($submission['name'] ?: 'New Customer');
 
-        $mail->CharSet = 'UTF-8';
-        $mail->setFrom($fromEmail, $fromName);
-        $mail->addAddress($toEmail);
-        $mail->addReplyTo($customerEmail, $customerName);
-        $mail->Subject = 'New Nashmi Request - ' . $service . ' - ' . $name;
-        $mail->isHTML(false);
-        $mail->Body = buildRequestEmail($submission, $brand);
-        $mail->AltBody = $mail->Body;
+       $mail->CharSet = 'UTF-8';
+
+$mail->setFrom($fromEmail, $fromName);
+$mail->addAddress($toEmail);
+$mail->addReplyTo($customerEmail, $customerName);
+$mail->Subject = 'New Nashmi Request - ' . $service . ' - ' . $name;
+
+$mail->Body = buildRequestEmail($submission, $brand);
+$mail->AltBody = $mail->Body;
 
         $mail->send();
         return ['sent' => true, 'error' => ''];

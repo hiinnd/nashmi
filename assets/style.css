@@ -1822,16 +1822,7 @@ body.request-success-modal-open {
     color: #07162d;
 }
 
-.service-area-regions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px 14px;
-    margin-top: 12px;
-    color: var(--ink);
-    font-size: clamp(1rem, 2vw, 1.18rem);
-    font-weight: 900;
-}
+
 
 .service-area-regions span {
     display: inline-flex;
@@ -2239,6 +2230,7 @@ body.request-success-modal-open {
 
 @media (max-width: 680px) {
     .hero-service-note {
+        
         width: 100%;
         min-height: 0;
         justify-content: stretch;
@@ -2246,6 +2238,28 @@ body.request-success-modal-open {
         padding: 9px 16px;
         text-align: left;
     }
+   
+    .service-area-regions{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:nowrap;     /* ممنوع ينزل سطر */
+    white-space:nowrap;   /* ممنوع يكسر النص */
+    gap:8px;
+    overflow:hidden;      /* بدون سكرول */
+    font-size:clamp(.55rem,2.3vw,.95rem);
+    font-weight:900;
+}
+
+.service-area-regions span{
+    white-space:nowrap;
+    flex:0 1 auto;
+}
+
+.service-area-regions span:not(:first-child)::before{
+    content:"•";
+    margin-right:8px;
+}
 
     .hero-service-note i {
         margin-top: 2px;
@@ -2275,6 +2289,9 @@ body.request-success-modal-open {
 }
 
 @media (max-width: 680px) {
+    .service-area-regions {
+        flex-direction: row; 
+    }
     body {
         padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important; 
         background: #000000;
