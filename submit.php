@@ -1,5 +1,6 @@
 <?php
-declare(strict_types=1);
+require 'vendor/autoload.php';
+
 
 use PHPMailer\PHPMailer\Exception as MailerException;
 use PHPMailer\PHPMailer\PHPMailer;
@@ -240,10 +241,7 @@ if (in_array(strtolower(envValue('APP_DEBUG')), ['1', 'true', 'yes', 'on'], true
     error_reporting(E_ALL);
 }
 
-$autoload = __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-if (is_readable($autoload)) {
-    require $autoload;
-}
+
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     redirectWithStatus('error');
@@ -307,6 +305,9 @@ if (!is_dir($storage)) {
 file_put_contents($storage . DIRECTORY_SEPARATOR . 'requests.jsonl', json_encode($submission, JSON_UNESCAPED_SLASHES) . PHP_EOL, FILE_APPEND | LOCK_EX);
 
 $emailResult = sendEmailNotification($submission, $brand);
-$smsResult = sendSmsNotification($submission, $brand);
 
-redirectWithStatus($emailResult['sent'] && $smsResult['sent'] ? 'success' : 'delivery_error');
+redirectWithStatus(
+    $emailResult['sent']
+        ? 'success'
+        : 'delivery_error'
+);

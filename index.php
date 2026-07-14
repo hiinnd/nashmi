@@ -305,69 +305,7 @@ function sendSmsNotification(string $to, string $message): array
     }
 }
 
-if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
-    $required = ['name', 'phone', 'vehicle_year', 'vehicle_make', 'vehicle_model', 'service', 'location'];
-    foreach ($required as $field) {
-        if (empty(trim($_POST[$field] ?? ''))) {
-            $errors[] = $field;
-        }
-    }
-    $selectedService = trim($_POST['service'] ?? '');
-    if ($selectedService === 'Battery Replacement (on-site)') {
-        foreach (['appointment_date', 'appointment_time'] as $field) {
-            if (empty(trim($_POST[$field] ?? ''))) {
-                $errors[] = $field;
-            }
-        }
-    }
 
-    if (!$errors && empty($_POST['website'] ?? '')) {
-        $submission = [
-            'created_at' => date('c'),
-            'name' => trim($_POST['name'] ?? ''),
-            'phone' => trim($_POST['phone'] ?? ''),
-            'email' => trim($_POST['email'] ?? ''),
-            'vehicle' => trim(($_POST['vehicle_year'] ?? '') . ' ' . ($_POST['vehicle_make'] ?? '') . ' ' . ($_POST['vehicle_model'] ?? '')),
-            'vin' => strtoupper(trim($_POST['vin'] ?? '')),
-            'service' => trim($_POST['service'] ?? ''),
-            'appointment_date' => trim($_POST['appointment_date'] ?? ''),
-            'appointment_time' => trim($_POST['appointment_time'] ?? ''),
-            'location' => trim($_POST['location'] ?? ''),
-            'latitude' => trim($_POST['latitude'] ?? ''),
-            'longitude' => trim($_POST['longitude'] ?? ''),
-            'location_accuracy_meters' => trim($_POST['location_accuracy'] ?? ''),
-            'maps_url' => trim($_POST['maps_url'] ?? ''),
-            'notes' => trim($_POST['notes'] ?? ''),
-        ];
-
-        $storage = __DIR__ . DIRECTORY_SEPARATOR . 'storage';
-        if (!is_dir($storage)) {
-            mkdir($storage, 0775, true);
-        }
-
-        file_put_contents($storage . DIRECTORY_SEPARATOR . 'requests.jsonl', json_encode($submission, JSON_UNESCAPED_SLASHES) . PHP_EOL, FILE_APPEND | LOCK_EX);
-
-        $customerEmail = filter_var($submission['email'], FILTER_VALIDATE_EMAIL) ? cleanMailValue($submission['email']) : $brand['email'];
-        $customerName = cleanMailValue($submission['name'] ?: 'Nashmi Customer');
-        $subjectService = cleanMailValue($submission['service'] ?: 'Roadside Assistance');
-        $subjectName = cleanMailValue($submission['name'] ?: 'New Customer');
-        $mailSubject = 'New Nashmi Request - ' . $subjectService . ' - ' . $subjectName;
-        $mailBody = buildRequestEmail($submission, $brand);
-        $mailHeaders = [
-            'MIME-Version: 1.0',
-            'Content-Type: text/plain; charset=UTF-8',
-            'From: ' . cleanMailValue($brand['name']) . ' Website <' . cleanMailValue($brand['email']) . '>',
-            'Reply-To: ' . $customerName . ' <' . $customerEmail . '>',
-            'X-Mailer: PHP/' . phpversion(),
-        ];
-
-        $mailSent = mail($brand['email'], $mailSubject, $mailBody, implode("\r\n", $mailHeaders));
-        $smsResult = sendSmsNotification($brand['sms_to'], buildRequestSms($submission));
-        $formStatus = ($smsResult['sent'] && $mailSent) ? 'success' : 'delivery_error';
-    } elseif ($errors) {
-        $formStatus = 'error';
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
