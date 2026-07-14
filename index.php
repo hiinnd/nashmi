@@ -40,7 +40,7 @@ if (isDebugEnabled()) {
 
 $brand = [
     'name' => 'Nashmi',
-    'tagline' => 'Roadside help that gets you moving again.',
+    'tagline' => 'Your Roadside Emergency Ends Here.',
     'phone' => '(909) 992-6466',
     'phone_href' => 'tel:9099926466',
     'sms_to' => '+19099926466',
@@ -158,7 +158,8 @@ $serviceAreas = [
 ];
 
 
-$formStatus = null;
+$allowedStatuses = ['success', 'delivery_error', 'error'];
+$formStatus = in_array($_GET['status'] ?? '', $allowedStatuses, true) ? $_GET['status'] : null;
 $errors = [];
 
 function cleanMailValue(string $value): string
@@ -342,6 +343,11 @@ function sendSmsNotification(string $to, string $message): array
 }
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+    header('Location: index.php?status=error#request', true, 303);
+    exit;
+}
+
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     $required = ['name', 'phone', 'vehicle_year', 'vehicle_make', 'vehicle_model', 'service', 'location'];
     foreach ($required as $field) {
         if (empty(trim($_POST[$field] ?? ''))) {
@@ -444,7 +450,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             <div class="container hero-content">
                 <div class="hero-copy">
                     <div class="hero-badge"><i class="fa-solid fa-shield-halved"></i> Roadside Assistance - California</div>
-                    <h1>Roadside help that gets you moving again.</h1>
+                    <h1>Your Roadside Emergency Ends Here.</h1>
                     <p>When car trouble interrupts your day, Nashmi keeps the next step simple: send your location, choose the service, and get connected with the fastest roadside support.</p>
                <div class="hero-service-note">
     <i class="fa-solid fa-clock"></i> 
@@ -518,12 +524,32 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             <div class="container">
                 <div class="center-head">
                     <h2>Trusted by Drivers Across Southern California.</h2>
-                    <h2>What Our Customers Say</h2>
+                    <h2 class="reviews-title-red">What Our Customers Say</h2>
+                </div>
+                <div class="review-summary" aria-label="Overall rating 5 out of 5 based on 127 customer reviews">
+                    <span class="star-row" aria-hidden="true">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                    </span>
+                    <strong>5 out of 5</strong>
+                    <span>- based on 127 customer reviews</span>
                 </div>
                 <div class="reviews-grid">
                     <?php foreach ($reviews as $reviewGroup): ?>
                         <article class="review-card" data-review-card>
-                            <div class="stars">5 out of 5</div>
+                            <div class="stars" aria-label="5 out of 5 rating">
+                                <span class="star-row" aria-hidden="true">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                </span>
+                                <strong>5 out of 5</strong>
+                            </div>
                             <div class="review-slider">
                                 <?php foreach ($reviewGroup as $reviewIndex => $review): ?>
                                     <div class="review-slide <?= $reviewIndex === 0 ? 'active' : '' ?>" data-review-slide>
@@ -595,7 +621,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
                         <div class="alert error">Please fill in all required fields before sending your request.</div>
                     <?php endif; ?>
 
-                    <form method="post" action="#request" id="helpForm" novalidate>
+                    <form method="post" action="submit.php" id="helpForm" novalidate>
     <input type="text" name="website" tabindex="-1" autocomplete="off" class="honeypot" aria-hidden="true">
     
     <!-- قسم المعلومات الشخصية -->

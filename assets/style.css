@@ -2240,3 +2240,60 @@ body.request-success-modal-open {
         font-size: 0.68rem;
     }
 }
+
+/* Requested reviews polish. */
+.reviews-title-red {
+    color: var(--accent) !important;
+}
+
+.review-summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: -18px auto 44px;
+    color: #5f6673;
+    font-size: 0.98rem;
+}
+
+.review-summary strong {
+    color: #111;
+    font-weight: 900;
+}
+
+.stars {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #111;
+    font-weight: 900;
+}
+
+.star-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    color: #ff9800;
+    letter-spacing: 0;
+    line-height: 1;
+}
+
+.stars .star-row {
+    font-size: 0.92rem;
+}
+
+.review-summary .star-row {
+    font-size: 1rem;
+}
+
+@media (max-width: 680px) {
+    .review-summary {
+        flex-wrap: wrap;
+        margin-top: -14px;
+        text-align: center;
+    }
+
+    .stars {
+        flex-wrap: wrap;
+    }
+}
