@@ -12,7 +12,7 @@ function loadEnvFile(string $path): void
 
     foreach ($lines as $line) {
         $line = trim($line);
-        if ($line === '' || strpos($line, '#') === 0 || strpos($line, '=') === false) {
+        if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) {
             continue;
         }
 
@@ -40,14 +40,12 @@ if (isDebugEnabled()) {
 
 $brand = [
     'name' => 'Nashmi',
-    'tagline' => 'Your Roadside Emergency Ends Here.',
+    'tagline' => 'Roadside help that gets you moving again.',
     'phone' => '(909) 992-6466',
     'phone_href' => 'tel:9099926466',
     'sms_to' => '+19099926466',
     'email' => 'nashmiroad@gmail.com',
-    'mail_from' => 'noreply@nashmi-road.com',
     'email_href' => 'mailto:nashmiroad@gmail.com',
-    'website_url' => 'https://www.nashmi-road.com/',
     'address' => 'Nashmi Roadside Assistance LLC, Butterfield Ranch Rd, Chino Hills, CA 91709, United States',
     'area' => 'California',
     'mark' => 'assets/images/n-mark-transparent.png',
@@ -158,8 +156,7 @@ $serviceAreas = [
 ];
 
 
-$allowedStatuses = ['success', 'delivery_error', 'error'];
-$formStatus = in_array($_GET['status'] ?? '', $allowedStatuses, true) ? $_GET['status'] : null;
+$formStatus = null;
 $errors = [];
 
 function cleanMailValue(string $value): string
@@ -197,7 +194,7 @@ function buildRequestEmail(array $submission, array $brand): string
         $submission['notes'] ?: 'No additional notes.',
         '',
         'Submitted at: ' . $submission['created_at'],
-        'Website: ' . $brand['website_url'],
+        'Website: ' . $brand['name'],
     ];
 
     return implode(PHP_EOL, $lines);
@@ -220,41 +217,6 @@ function buildRequestSms(array $submission): string
     ];
 
     return implode("\n", $lines);
-}
-
-function sendEmailNotification(array $submission, array $brand): array
-{
-    $customerEmail = filter_var($submission['email'], FILTER_VALIDATE_EMAIL) ? cleanMailValue($submission['email']) : $brand['email'];
-    $customerName = cleanMailValue($submission['name'] ?: 'Nashmi Customer');
-    $subjectService = cleanMailValue($submission['service'] ?: 'Roadside Assistance');
-    $subjectName = cleanMailValue($submission['name'] ?: 'New Customer');
-    $mailSubject = 'New Nashmi Request - ' . $subjectService . ' - ' . $subjectName;
-    $mailBody = buildRequestEmail($submission, $brand);
-    $mailHeaders = [
-        'MIME-Version: 1.0',
-        'Content-Type: text/plain; charset=UTF-8',
-        'From: ' . cleanMailValue($brand['name']) . ' Website <' . cleanMailValue($brand['mail_from']) . '>',
-        'Reply-To: ' . $customerName . ' <' . $customerEmail . '>',
-        'X-Mailer: PHP/' . phpversion(),
-    ];
-
-    $sent = mail($brand['email'], $mailSubject, $mailBody, implode("\r\n", $mailHeaders));
-
-    if (!$sent) {
-        $lastError = error_get_last();
-        logDeliveryIssue('email', [
-            'to' => $brand['email'],
-            'from' => $brand['mail_from'],
-            'subject' => $mailSubject,
-            'error' => $lastError['message'] ?? 'PHP mail() returned false.',
-        ]);
-    }
-
-    return [
-        'sent' => $sent,
-        'to' => $brand['email'],
-        'error' => $sent ? '' : 'PHP mail() returned false.',
-    ];
 }
 
 function logDeliveryIssue(string $channel, array $context): void
@@ -343,11 +305,6 @@ function sendSmsNotification(string $to, string $message): array
 }
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
-    header('Location: index.php?status=error#request', true, 303);
-    exit;
-}
-
-if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     $required = ['name', 'phone', 'vehicle_year', 'vehicle_make', 'vehicle_model', 'service', 'location'];
     foreach ($required as $field) {
         if (empty(trim($_POST[$field] ?? ''))) {
@@ -389,9 +346,23 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 
         file_put_contents($storage . DIRECTORY_SEPARATOR . 'requests.jsonl', json_encode($submission, JSON_UNESCAPED_SLASHES) . PHP_EOL, FILE_APPEND | LOCK_EX);
 
-        $emailResult = sendEmailNotification($submission, $brand);
+        $customerEmail = filter_var($submission['email'], FILTER_VALIDATE_EMAIL) ? cleanMailValue($submission['email']) : $brand['email'];
+        $customerName = cleanMailValue($submission['name'] ?: 'Nashmi Customer');
+        $subjectService = cleanMailValue($submission['service'] ?: 'Roadside Assistance');
+        $subjectName = cleanMailValue($submission['name'] ?: 'New Customer');
+        $mailSubject = 'New Nashmi Request - ' . $subjectService . ' - ' . $subjectName;
+        $mailBody = buildRequestEmail($submission, $brand);
+        $mailHeaders = [
+            'MIME-Version: 1.0',
+            'Content-Type: text/plain; charset=UTF-8',
+            'From: ' . cleanMailValue($brand['name']) . ' Website <' . cleanMailValue($brand['email']) . '>',
+            'Reply-To: ' . $customerName . ' <' . $customerEmail . '>',
+            'X-Mailer: PHP/' . phpversion(),
+        ];
+
+        $mailSent = mail($brand['email'], $mailSubject, $mailBody, implode("\r\n", $mailHeaders));
         $smsResult = sendSmsNotification($brand['sms_to'], buildRequestSms($submission));
-        $formStatus = ($emailResult['sent'] && $smsResult['sent']) ? 'success' : 'delivery_error';
+        $formStatus = ($smsResult['sent'] || $mailSent) ? 'success' : 'delivery_error';
     } elseif ($errors) {
         $formStatus = 'error';
     }
@@ -450,7 +421,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             <div class="container hero-content">
                 <div class="hero-copy">
                     <div class="hero-badge"><i class="fa-solid fa-shield-halved"></i> Roadside Assistance - California</div>
-                    <h1>Your Roadside Emergency Ends Here.</h1>
+                    <h1>Your Roadside Emergency Ends Here</h1>
                     <p>When car trouble interrupts your day, Nashmi keeps the next step simple: send your location, choose the service, and get connected with the fastest roadside support.</p>
                <div class="hero-service-note">
     <i class="fa-solid fa-clock"></i> 
@@ -524,32 +495,12 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             <div class="container">
                 <div class="center-head">
                     <h2>Trusted by Drivers Across Southern California.</h2>
-                    <h2 class="reviews-title-red">What Our Customers Say</h2>
-                </div>
-                <div class="review-summary" aria-label="Overall rating 5 out of 5 based on 127 customer reviews">
-                    <span class="star-row" aria-hidden="true">
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                    </span>
-                    <strong>5 out of 5</strong>
-                    <span>- based on 127 customer reviews</span>
+                    <h2>What Our Customers Say</h2>
                 </div>
                 <div class="reviews-grid">
                     <?php foreach ($reviews as $reviewGroup): ?>
                         <article class="review-card" data-review-card>
-                            <div class="stars" aria-label="5 out of 5 rating">
-                                <span class="star-row" aria-hidden="true">
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                    <i class="fa-solid fa-star"></i>
-                                </span>
-                                <strong>5 out of 5</strong>
-                            </div>
+                            <div class="stars">5 out of 5</div>
                             <div class="review-slider">
                                 <?php foreach ($reviewGroup as $reviewIndex => $review): ?>
                                     <div class="review-slide <?= $reviewIndex === 0 ? 'active' : '' ?>" data-review-slide>
@@ -616,12 +567,12 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 
                 <div class="form-panel">
                     <?php if ($formStatus === 'delivery_error'): ?>
-                        <div class="alert error">Your request was saved, but email or text message delivery failed. Please call us directly.</div>
+                        <div class="alert error">Your request was saved, but text/email delivery is not configured on this server. Please call us directly.</div>
                     <?php elseif ($formStatus === 'error'): ?>
                         <div class="alert error">Please fill in all required fields before sending your request.</div>
                     <?php endif; ?>
 
-                    <form method="post" action="submit.php" id="helpForm" novalidate>
+                    <form method="post" action="#request" id="helpForm" novalidate>
     <input type="text" name="website" tabindex="-1" autocomplete="off" class="honeypot" aria-hidden="true">
     
     <!-- قسم المعلومات الشخصية -->
@@ -750,7 +701,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             <button class="request-success-close" type="button" data-request-success-close aria-label="Close success message"><i class="fa-solid fa-xmark"></i></button>
             <div class="request-success-icon"><i class="fa-solid fa-check"></i></div>
             <h2 id="requestSuccessTitle">Success</h2>
-            <p>Your request was sent to Nashmi by email and text message with the details you entered. We will contact you within minutes.</p>
+            <p>Your request was sent to Nashmi with the details you entered. We will contact you within minutes.</p>
             <button class="btn request-success-action" type="button" data-request-success-close>Done</button>
         </div>
     </div>

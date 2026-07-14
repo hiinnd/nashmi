@@ -483,11 +483,6 @@ textarea {
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.07);
 }
 
-.stars {
-    color: var(--accent);
-    font-weight: 900;
-}
-
 .review-slider {
     position: relative;
     min-height: 178px;
@@ -2243,15 +2238,22 @@ body.request-success-modal-open {
 
 /* Requested reviews polish. */
 .reviews-title-red {
-    color: var(--accent) !important;
+    display: block;
+    margin-bottom: 12px;
+    color: var(--accent);
+    font-size: 0.82rem;
+    line-height: 1.1;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
 }
 
 .review-summary {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    margin: -18px auto 44px;
+    gap: 9px;
+    margin: -20px auto 44px;
     color: #5f6673;
     font-size: 0.98rem;
 }
@@ -2272,18 +2274,18 @@ body.request-success-modal-open {
 .star-row {
     display: inline-flex;
     align-items: center;
-    gap: 2px;
-    color: #ff9800;
+    gap: 3px;
+    color: #f5a400;
     letter-spacing: 0;
     line-height: 1;
 }
 
 .stars .star-row {
-    font-size: 0.92rem;
+    font-size: 1rem;
 }
 
 .review-summary .star-row {
-    font-size: 1rem;
+    font-size: 1.35rem;
 }
 
 @media (max-width: 680px) {

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 use PHPMailer\PHPMailer\Exception as MailerException;
 use PHPMailer\PHPMailer\PHPMailer;
-use Twilio\Rest\Client as TwilioClient;
 
 function loadEnvFile(string $path): void
 {
@@ -71,53 +70,45 @@ function buildRequestEmail(array $submission, array $brand): string
         'New Nashmi roadside assistance request',
         '',
         'Customer',
-        'Name: ' . ($submission['name'] ?: 'Not provided'),
-        'Phone: ' . ($submission['phone'] ?: 'Not provided'),
-        'Email: ' . ($submission['email'] ?: 'Not provided'),
+        'Full Name: ' . ($submission['name'] ?: 'Not provided'),
+        'Phone Number: ' . ($submission['phone'] ?: 'Not provided'),
+        'Email Address: ' . ($submission['email'] ?: 'Not provided'),
         '',
-        'Vehicle',
+        'Car Information',
+        'Make: ' . ($submission['vehicle_make'] ?: 'Not provided'),
+        'Model: ' . ($submission['vehicle_model'] ?: 'Not provided'),
+        'Year: ' . ($submission['vehicle_year'] ?: 'Not provided'),
         'Vehicle: ' . ($submission['vehicle'] ?: 'Not provided'),
-        'VIN: ' . ($submission['vin'] ?: 'Not provided'),
+        'VIN Number: ' . ($submission['vin'] ?: 'Not provided'),
         '',
         'Service',
-        'Service needed: ' . ($submission['service'] ?: 'Not provided'),
-        'Appointment date: ' . ($submission['appointment_date'] ?: 'Not selected'),
-        'Appointment time: ' . ($submission['appointment_time'] ?: 'Not selected'),
+        'Service Needed: ' . ($submission['service'] ?: 'Not provided'),
+    ];
+
+    if ($submission['service'] === 'Battery Replacement (on-site)') {
+        $lines = array_merge($lines, [
+            'Battery Replacement Appointment Date: ' . ($submission['appointment_date'] ?: 'Not selected'),
+            'Battery Replacement Appointment Time: ' . ($submission['appointment_time'] ?: 'Not selected'),
+        ]);
+    }
+
+    $lines = array_merge($lines, [
         '',
         'Location',
-        'Address/location: ' . ($submission['location'] ?: 'Not provided'),
+        'Street Address / Current Location: ' . ($submission['location'] ?: 'Not provided'),
         'Latitude: ' . ($submission['latitude'] ?: 'Not provided'),
         'Longitude: ' . ($submission['longitude'] ?: 'Not provided'),
         'Accuracy meters: ' . ($submission['location_accuracy_meters'] ?: 'Not provided'),
         'Maps URL: ' . ($submission['maps_url'] ?: 'Not provided'),
         '',
-        'Notes',
+        'Additional Details',
         $submission['notes'] ?: 'No additional notes.',
         '',
         'Submitted at: ' . $submission['created_at'],
         'Website: ' . $brand['website_url'],
-    ];
+    ]);
 
     return implode(PHP_EOL, $lines);
-}
-
-function buildRequestSms(array $submission): string
-{
-    $lines = [
-        'New Nashmi Request',
-        'Name: ' . ($submission['name'] ?: 'Not provided'),
-        'Phone: ' . ($submission['phone'] ?: 'Not provided'),
-        'Email: ' . ($submission['email'] ?: 'Not provided'),
-        'Vehicle: ' . ($submission['vehicle'] ?: 'Not provided'),
-        'VIN: ' . ($submission['vin'] ?: 'Not provided'),
-        'Service: ' . ($submission['service'] ?: 'Not provided'),
-        'Appointment: ' . trim(($submission['appointment_date'] ?: 'Not selected') . ' ' . ($submission['appointment_time'] ?: '')),
-        'Location: ' . ($submission['location'] ?: 'Not provided'),
-        'Maps: ' . ($submission['maps_url'] ?: 'Not provided'),
-        'Notes: ' . ($submission['notes'] ?: 'No additional notes.'),
-    ];
-
-    return implode("\n", $lines);
 }
 
 function sendEmailNotification(array $submission, array $brand): array
@@ -175,39 +166,13 @@ function sendEmailNotification(array $submission, array $brand): array
     }
 }
 
-function sendSmsNotification(string $to, string $message): array
-{
-    $accountSid = envValue('TWILIO_ACCOUNT_SID');
-    $authToken = envValue('TWILIO_AUTH_TOKEN');
-    $fromNumber = envValue('TWILIO_FROM_NUMBER');
-
-    if ($accountSid === '' || $authToken === '' || $fromNumber === '') {
-        $error = 'Missing Twilio SMS settings.';
-        logDeliveryIssue('sms', ['to' => $to, 'from_configured' => $fromNumber !== '', 'error' => $error]);
-        return ['sent' => false, 'error' => $error];
-    }
-
-    if (!class_exists(TwilioClient::class)) {
-        $error = 'Twilio SDK is not installed. Run composer install.';
-        logDeliveryIssue('sms', ['to' => $to, 'error' => $error]);
-        return ['sent' => false, 'error' => $error];
-    }
-
-    try {
-        $client = new TwilioClient($accountSid, $authToken);
-        $twilioMessage = $client->messages->create($to, [
-            'from' => $fromNumber,
-            'body' => $message,
-        ]);
-
-        return ['sent' => true, 'message_sid' => $twilioMessage->sid ?? null, 'error' => ''];
-    } catch (Throwable $e) {
-        logDeliveryIssue('sms', ['to' => $to, 'from' => $fromNumber, 'error' => $e->getMessage()]);
-        return ['sent' => false, 'error' => $e->getMessage()];
-    }
-}
-
 loadEnvFile(__DIR__ . DIRECTORY_SEPARATOR . '.env');
+
+if (in_array(strtolower(envValue('APP_DEBUG')), ['1', 'true', 'yes', 'on'], true)) {
+    ini_set('display_errors', '1');
+    ini_set('display_startup_errors', '1');
+    error_reporting(E_ALL);
+}
 
 $autoload = __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 if (is_readable($autoload)) {
@@ -220,7 +185,6 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
 
 $brand = [
     'name' => 'Nashmi',
-    'sms_to' => envValue('COMPANY_SMS_TO', '+19099926466'),
     'email' => envValue('MAIL_TO_ADDRESS', 'nashmiroad@gmail.com'),
     'mail_from' => envValue('MAIL_FROM_ADDRESS', 'noreply@nashmi-road.com'),
     'website_url' => 'https://www.nashmi-road.com/',
@@ -252,6 +216,9 @@ $submission = [
     'name' => trim((string) ($_POST['name'] ?? '')),
     'phone' => trim((string) ($_POST['phone'] ?? '')),
     'email' => trim((string) ($_POST['email'] ?? '')),
+    'vehicle_year' => trim((string) ($_POST['vehicle_year'] ?? '')),
+    'vehicle_make' => trim((string) ($_POST['vehicle_make'] ?? '')),
+    'vehicle_model' => trim((string) ($_POST['vehicle_model'] ?? '')),
     'vehicle' => trim((string) ($_POST['vehicle_year'] ?? '') . ' ' . (string) ($_POST['vehicle_make'] ?? '') . ' ' . (string) ($_POST['vehicle_model'] ?? '')),
     'vin' => strtoupper(trim((string) ($_POST['vin'] ?? ''))),
     'service' => trim((string) ($_POST['service'] ?? '')),
@@ -273,6 +240,5 @@ if (!is_dir($storage)) {
 file_put_contents($storage . DIRECTORY_SEPARATOR . 'requests.jsonl', json_encode($submission, JSON_UNESCAPED_SLASHES) . PHP_EOL, FILE_APPEND | LOCK_EX);
 
 $emailResult = sendEmailNotification($submission, $brand);
-$smsResult = sendSmsNotification($brand['sms_to'], buildRequestSms($submission));
 
-redirectWithStatus($emailResult['sent'] && $smsResult['sent'] ? 'success' : 'delivery_error');
+redirectWithStatus($emailResult['sent'] ? 'success' : 'delivery_error');
