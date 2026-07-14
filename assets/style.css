@@ -893,6 +893,9 @@ textarea:focus {
     min-height: 42px;
     margin-bottom: 10px;
     overflow-wrap: anywhere;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    padding-left: 5px;
 }
 
 .footer-contact-item i {
@@ -903,6 +906,15 @@ textarea:focus {
     border-radius: 50%;
     color: #fff;
     background: var(--accent);
+}
+
+.footer-contact-item:hover {
+    transform: translateX(10px);
+}
+
+.footer-contact-item:hover i {
+    box-shadow: 0 0 15px var(--accent); 
+    transition: box-shadow 0.3s ease;
 }
 
 .footer-bottom {
@@ -1807,6 +1819,14 @@ body.request-success-modal-open {
     background: #fff;
     border: 1px solid #dfe4ea;
     box-shadow: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.cities span:hover {
+    background-color: var(--accent);
+    color: #ffffff; 
+    border-color: var(--accent); 
 }
 
 @media (max-width: 1020px) {
