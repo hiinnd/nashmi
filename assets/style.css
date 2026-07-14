@@ -468,24 +468,36 @@ textarea {
     background: #fff;
 }
 
+.reviews .center-head {
+    width: min(760px, 100%);
+    margin-bottom: 46px;
+}
+
+.reviews .center-head h2 {
+    font-size: clamp(2.6rem, 4.8vw, 3.25rem);
+    line-height: 1.08;
+}
+
 .reviews-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 22px;
+    align-items: stretch;
 }
 
 .review-card {
-    min-height: 250px;
+    min-height: 277px;
     padding: 28px;
     border: 1px solid var(--line);
     border-radius: 8px;
     background: #fff;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.07);
+    box-shadow: 0 18px 38px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
 }
 
 .review-slider {
     position: relative;
-    min-height: 178px;
+    min-height: 180px;
 }
 
 .review-slide {
@@ -508,6 +520,8 @@ textarea {
 .review-card blockquote {
     margin: 14px 0 22px;
     color: #303030;
+    font-size: 1.04rem;
+    line-height: 1.55;
 }
 
 .review-author {
@@ -532,6 +546,11 @@ textarea {
 .review-author small {
     display: block;
     color: var(--muted);
+    line-height: 1.35;
+}
+
+.review-author small i {
+    margin-right: 3px;
 }
 
 .service-area {
@@ -1101,7 +1120,6 @@ body.request-success-modal-open {
     }
 }
 
-/* Restored Nashmi identity and original service-card structure. */
 .brand {
     gap: 0;
     min-width: 0;
@@ -1529,7 +1547,6 @@ body.request-success-modal-open {
     }
 }
 
-/* Final responsive locks for restored card layout. */
 @media (max-width: 680px) {
     .brand-mark {
         width: 48px;
@@ -1576,7 +1593,6 @@ body.request-success-modal-open {
     }
 }
 
-/* Client-requested final homepage polish. */
 .brand {
     gap: 6px;
 }
@@ -1893,7 +1909,6 @@ body.request-success-modal-open {
     }
 }
 
-/* Final brand-color pass: black header, red/black/white cards, 24/7 pill. */
 .site-header,
 .site-header.scrolled {
     background: rgba(5, 5, 5, 0.86);
@@ -2188,12 +2203,10 @@ body.request-success-modal-open {
     display: none;
 }
 
-
 @media (max-width: 680px) {
     body {
         padding-bottom: 50px !important; 
         background: #000000;
-        
     }
     
     .mobile-cta {
@@ -2256,10 +2269,9 @@ body.request-success-modal-open {
     }
 }
 
-/* Requested reviews polish. */
 .reviews-title-red {
     display: block;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     color: var(--accent);
     font-size: 0.82rem;
     line-height: 1.1;
@@ -2273,7 +2285,7 @@ body.request-success-modal-open {
     align-items: center;
     justify-content: center;
     gap: 9px;
-    margin: -20px auto 44px;
+    margin: 20px auto 0;
     color: #5f6673;
     font-size: 0.98rem;
 }
@@ -2287,6 +2299,7 @@ body.request-success-modal-open {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-top: 15px;
     color: #111;
     font-weight: 900;
 }
@@ -2309,9 +2322,13 @@ body.request-success-modal-open {
 }
 
 @media (max-width: 680px) {
+    .reviews .center-head h2 {
+        font-size: clamp(2rem, 10vw, 2.7rem);
+    }
+
     .review-summary {
         flex-wrap: wrap;
-        margin-top: -14px;
+        margin-top: 14px;
         text-align: center;
     }
 
@@ -2319,3 +2336,4 @@ body.request-success-modal-open {
         flex-wrap: wrap;
     }
 }
+

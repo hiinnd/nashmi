@@ -274,11 +274,16 @@ function startReviewSliders() {
         }
 
         let activeIndex = 0;
-        setInterval(() => {
+        const showNextReview = () => {
             slides[activeIndex].classList.remove("active");
             activeIndex = (activeIndex + 1) % slides.length;
             slides[activeIndex].classList.add("active");
-        }, 5200 + cardIndex * 650);
+        };
+
+        setTimeout(() => {
+            showNextReview();
+            setInterval(showNextReview, 5000);
+        }, cardIndex * 550);
     });
 }
 

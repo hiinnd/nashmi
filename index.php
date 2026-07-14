@@ -495,13 +495,33 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         <section class="section reviews" id="reviews">
             <div class="container">
                 <div class="center-head">
+                    <span class="reviews-title-red">What Our Customers Say</span>
                     <h2>Trusted by Drivers Across Southern California.</h2>
-                    <h2>What Our Customers Say</h2>
+                    <div class="review-summary" aria-label="Customer review rating">
+                        <span class="star-row" aria-hidden="true">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </span>
+                        <strong>5 out of 5</strong>
+                        <span>- based on 127 customer reviews</span>
+                    </div>
                 </div>
                 <div class="reviews-grid">
                     <?php foreach ($reviews as $reviewGroup): ?>
                         <article class="review-card" data-review-card>
-                            <div class="stars">5 out of 5</div>
+                            <div class="stars" aria-label="5 out of 5 stars">
+                                <span class="star-row" aria-hidden="true">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                </span>
+                                <span>5 out of 5</span>
+                            </div>
                             <div class="review-slider">
                                 <?php foreach ($reviewGroup as $reviewIndex => $review): ?>
                                     <div class="review-slide <?= $reviewIndex === 0 ? 'active' : '' ?>" data-review-slide>
