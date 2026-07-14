@@ -2462,3 +2462,196 @@ body.request-success-modal-open {
     }
 }
 
+.site-header,
+.site-header.scrolled {
+    position: fixed;
+    inset: 0 0 auto;
+    background: rgba(5, 5, 5, 0.84);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16);
+    backdrop-filter: blur(9px);
+}
+
+.service-area-regions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    margin-top: 18px;
+    color: #202124;
+    font-size: clamp(1.28rem, 2.15vw, 1.9rem);
+    line-height: 1.15;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.service-area-regions span {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+.service-area-regions span::before,
+.service-area-regions span:not(:first-child)::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.service-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.service-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.service-card .service-body p {
+    margin-bottom: 24px;
+}
+
+.service-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(150px, max-content) minmax(110px, max-content);
+    align-items: stretch;
+    gap: 12px;
+    margin-top: auto;
+}
+
+.service-card .service-action,
+.service-card .service-call {
+    min-height: 60px;
+    white-space: nowrap;
+}
+
+.service-card .service-action {
+    min-width: 160px;
+}
+
+.service-card .service-call {
+    min-width: 112px;
+}
+
+@media (max-width: 680px) {
+    body {
+        padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important;
+    }
+
+    .site-header,
+    .site-header.scrolled {
+        position: fixed;
+        background: rgba(5, 5, 5, 0.9);
+    }
+
+    .header-inner {
+        min-height: 86px;
+        padding-block: 8px;
+    }
+
+    .site-header .brand {
+        gap: 0;
+        min-width: 0;
+    }
+
+    .site-header .brand-mark {
+        width: 76px;
+        height: 56px;
+    }
+
+    .site-header .brand-word {
+        margin-left: -3px;
+        font-size: clamp(1.38rem, 6vw, 1.72rem);
+        line-height: 1;
+    }
+
+    .menu-toggle {
+        width: 54px;
+        height: 54px;
+    }
+
+    .menu-toggle span {
+        width: 27px;
+        height: 3px;
+        margin: 5px auto;
+    }
+
+    .nav {
+        top: 86px;
+    }
+
+    .hero {
+        padding-top: 104px;
+    }
+
+    .service-actions {
+        grid-template-columns: minmax(0, 1fr) minmax(96px, 0.52fr);
+        gap: 10px;
+    }
+
+    .service-card .service-action,
+    .service-card .service-call {
+        min-width: 0;
+        min-height: 54px;
+        padding-inline: 12px;
+        font-size: 0.94rem;
+    }
+
+    .service-area-regions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: min(100%, 360px);
+        gap: 10px 12px;
+        font-size: clamp(0.98rem, 4.4vw, 1.22rem);
+    }
+
+    .service-area-regions span {
+        justify-content: center;
+    }
+
+    .service-area-regions span:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .mobile-cta {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 999;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        min-height: 68px;
+        padding-bottom: env(safe-area-inset-bottom);
+        background: #111;
+    }
+
+    .mobile-cta a {
+        min-height: 68px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 900;
+        text-align: center;
+    }
+
+    .mobile-cta-call {
+        background: var(--accent);
+    }
+
+    .mobile-cta-help {
+        background: #101010;
+    }
+}
+

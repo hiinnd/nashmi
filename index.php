@@ -328,7 +328,7 @@ if (!empty($_SESSION['show_success_modal'])) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/style.css?v=27">
+    <link rel="stylesheet" href="assets/style.css?v=32">
 </head>
 <body>
     
@@ -442,7 +442,7 @@ if (!empty($_SESSION['show_success_modal'])) {
             <div class="container">
                 <div class="center-head">
                     <span class="reviews-title-red">What Our Customers Say</span>
-                    <h2>Trusted by Drivers Across Southern California.</h2>
+                    <h2>Trusted by Drivers Across Southern California</h2>
                     <div class="review-summary" aria-label="Customer review rating">
                         <span class="star-row" aria-hidden="true">
                             <i class="fa-solid fa-star"></i>
@@ -494,7 +494,9 @@ if (!empty($_SESSION['show_success_modal'])) {
                     <span class="eyebrow">Service Area</span>
                     <h2>Serving</h2>
                     <div class="service-area-regions" aria-label="Primary service regions">
-                        <h3><span> • ORANGE COUNTY • INLAND EMPIRE • LOS ANGELES COUNTY </span></h3>
+                        <span>Orange County</span>
+                        <span>Inland Empire</span>
+                        <span>Los Angeles County</span>
                     </div>
                     <p>From Orange County to nearby Inland Empire and Los Angeles County cities - wherever you're stranded, we're on the way.</p>
                 </div>
@@ -517,7 +519,7 @@ if (!empty($_SESSION['show_success_modal'])) {
             <div class="container request-grid">
                 <aside class="request-info">
                     <span>Contact Nashmi</span>
-                    <h2>Send the details and stay by your phone.</h2>
+                    <h2>Send the details and stay by your phone</h2>
                     <p>Use the form to share the basics. For battery replacement, choose the appointment date and time that works for you.</p>
                     <a class="contact-line" href="<?= htmlspecialchars($brand['phone_href']) ?>"><i class="fa-solid fa-phone"></i><strong><?= htmlspecialchars($brand['phone']) ?></strong></a>
                     <div class="email-choice">
@@ -542,7 +544,7 @@ if (!empty($_SESSION['show_success_modal'])) {
                     <?php endif; ?>
 
                     <form method="post" action="submit.php" id="helpForm" novalidate>
-    <input type="text" name="website" tabindex="-1" autocomplete="off" class="honeypot" aria-hidden="true">
+    <input type="hidden" name="company_url" value="" class="honeypot" aria-hidden="true">
     
     <!-- قسم المعلومات الشخصية -->
     <div class="form-row">

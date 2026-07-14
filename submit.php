@@ -40,6 +40,14 @@ function envValue(string $key, string $default = ''): string
 
 function redirectWithStatus(string $status): never
 {
+    if ($status === 'success') {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+
+        $_SESSION['show_success_modal'] = true;
+    }
+
     header('Location: index.php?status=' . rawurlencode($status) . '#request', true, 303);
     exit;
 }
@@ -47,6 +55,16 @@ function redirectWithStatus(string $status): never
 function cleanHeaderValue(string $value): string
 {
     return trim(str_replace(["\r", "\n"], ' ', $value));
+}
+
+function emailText(string $value): string
+{
+    return trim($value) !== '' ? trim($value) : 'Not provided';
+}
+
+function emailHtml(string $value): string
+{
+    return htmlspecialchars(emailText($value), ENT_QUOTES, 'UTF-8');
 }
 
 function logDeliveryIssue(string $channel, array $context): void
@@ -67,6 +85,61 @@ function logDeliveryIssue(string $channel, array $context): void
 }
 
 function buildRequestEmail(array $submission, array $brand): string
+{
+    $mapsUrl = trim($submission['maps_url'] ?? '');
+    $rows = [
+        'Customer' => [
+            'Full Name' => $submission['name'] ?? '',
+            'Phone Number' => $submission['phone'] ?? '',
+            'Email Address' => $submission['email'] ?? '',
+        ],
+        'Car Information' => [
+            'Make' => $submission['vehicle_make'] ?? '',
+            'Model' => $submission['vehicle_model'] ?? '',
+            'Year' => $submission['vehicle_year'] ?? '',
+            'Vehicle' => $submission['vehicle'] ?? '',
+            'VIN Number' => $submission['vin'] ?? '',
+        ],
+        'Service' => [
+            'Service Needed' => $submission['service'] ?? '',
+        ],
+        'Location' => [
+            'Street Address / Current Location' => $submission['location'] ?? '',
+            'Latitude' => $submission['latitude'] ?? '',
+            'Longitude' => $submission['longitude'] ?? '',
+            'Accuracy meters' => $submission['location_accuracy_meters'] ?? '',
+        ],
+    ];
+
+    if (($submission['service'] ?? '') === 'Battery Replacement (on-site)') {
+        $rows['Service']['Appointment Date'] = $submission['appointment_date'] ?? '';
+        $rows['Service']['Appointment Time'] = $submission['appointment_time'] ?? '';
+    }
+
+    $detailsHtml = '';
+    foreach ($rows as $section => $items) {
+        $detailsHtml .= '<tr><td style="padding:22px 0 10px;"><h2 style="margin:0;color:#07162d;font-size:18px;line-height:1.25;">' . htmlspecialchars($section, ENT_QUOTES, 'UTF-8') . '</h2></td></tr>';
+        foreach ($items as $label => $value) {
+            $detailsHtml .= '<tr><td style="padding:0 0 10px;"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;background:#f7f8fa;border:1px solid #e7e9ee;border-radius:8px;"><tr><td style="padding:12px 14px;color:#667085;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;width:38%;">' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . '</td><td style="padding:12px 14px;color:#111827;font-size:15px;line-height:1.45;font-weight:700;">' . emailHtml((string) $value) . '</td></tr></table></td></tr>';
+        }
+    }
+
+    $mapsHtml = $mapsUrl !== ''
+        ? '<a href="' . htmlspecialchars($mapsUrl, ENT_QUOTES, 'UTF-8') . '" style="display:inline-block;padding:13px 18px;border-radius:8px;background:#df1f2d;color:#ffffff;text-decoration:none;font-weight:800;">Open Location Map</a>'
+        : '<span style="color:#667085;">Map link was not provided.</span>';
+
+    return '<!doctype html><html><body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,Helvetica,sans-serif;color:#111827;">'
+        . '<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;background:#f3f4f6;"><tr><td align="center" style="padding:28px 14px;">'
+        . '<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;border-collapse:collapse;background:#ffffff;border:1px solid #e7e9ee;border-radius:14px;overflow:hidden;">'
+        . '<tr><td style="padding:26px 30px 18px;border-bottom:1px solid #edf0f3;"><img src="https://www.nashmi-road.com/assets/images/nashmi-logo.png" width="150" alt="Nashmi" style="display:block;width:150px;max-width:58%;height:auto;margin:0 0 18px;"><p style="margin:0 0 8px;color:#df1f2d;font-size:12px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;">New Roadside Request</p><h1 style="margin:0;color:#07162d;font-size:28px;line-height:1.15;">Nashmi Assistance Request</h1><p style="margin:12px 0 0;color:#5b6472;font-size:16px;line-height:1.55;">A customer submitted a roadside assistance request. Review the details below and contact them as soon as possible.</p></td></tr>'
+        . '<tr><td style="padding:6px 30px 4px;">' . $detailsHtml . '</td></tr>'
+        . '<tr><td style="padding:10px 30px 24px;"><h2 style="margin:0 0 10px;color:#07162d;font-size:18px;">Additional Details</h2><div style="padding:16px;border:1px solid #e7e9ee;border-radius:8px;background:#f7f8fa;color:#111827;font-size:15px;line-height:1.55;">' . nl2br(emailHtml($submission['notes'] ?? '')) . '</div></td></tr>'
+        . '<tr><td style="padding:0 30px 28px;">' . $mapsHtml . '</td></tr>'
+        . '<tr><td style="padding:16px 30px;background:#07162d;color:#cdd5df;font-size:12px;line-height:1.55;">Submitted at: ' . emailHtml($submission['created_at'] ?? '') . '<br>Website: ' . emailHtml($brand['website_url'] ?? $brand['name']) . '</td></tr>'
+        . '</table></td></tr></table></body></html>';
+}
+
+function buildRequestEmailText(array $submission, array $brand): string
 {
     $lines = [
         'New Nashmi roadside assistance request',
@@ -184,8 +257,9 @@ $mail->addAddress($toEmail);
 $mail->addReplyTo($customerEmail, $customerName);
 $mail->Subject = 'New Nashmi Request - ' . $service . ' - ' . $name;
 
+$mail->isHTML(true);
 $mail->Body = buildRequestEmail($submission, $brand);
-$mail->AltBody = $mail->Body;
+$mail->AltBody = buildRequestEmailText($submission, $brand);
 
         $mail->send();
         return ['sent' => true, 'error' => ''];
@@ -274,7 +348,14 @@ if ($selectedService === 'Battery Replacement (on-site)') {
     }
 }
 
-if ($errors || !empty($_POST['website'] ?? '')) {
+$honeypotValue = trim((string) ($_POST['company_url'] ?? $_POST['website'] ?? ''));
+if ($errors || $honeypotValue !== '') {
+    logDeliveryIssue('validation', [
+        'missing_fields' => $errors,
+        'honeypot_filled' => $honeypotValue !== '',
+        'posted_fields' => array_keys($_POST),
+    ]);
+
     redirectWithStatus('error');
 }
 
