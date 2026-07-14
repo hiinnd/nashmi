@@ -110,7 +110,7 @@ function buildRequestEmail(array $submission, array $brand): string
         'Website: ' . $brand['website_url'],
     ]);
 
-    return implode(PHP_EOL, $lines);
+    return implode("\r\n", $lines);
 }
 
 function buildRequestSms(array $submission): string
@@ -182,6 +182,7 @@ function sendEmailNotification(array $submission, array $brand): array
         $mail->addAddress($toEmail);
         $mail->addReplyTo($customerEmail, $customerName);
         $mail->Subject = 'New Nashmi Request - ' . $service . ' - ' . $name;
+        $mail->isHTML(false);
         $mail->Body = buildRequestEmail($submission, $brand);
         $mail->AltBody = $mail->Body;
 
