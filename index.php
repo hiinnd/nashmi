@@ -156,7 +156,8 @@ $serviceAreas = [
 ];
 
 
-$formStatus = null;
+$allowedStatuses = ['success', 'delivery_error', 'error'];
+$formStatus = in_array($_GET['status'] ?? '', $allowedStatuses, true) ? $_GET['status'] : null;
 $errors = [];
 
 function cleanMailValue(string $value): string
@@ -362,7 +363,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 
         $mailSent = mail($brand['email'], $mailSubject, $mailBody, implode("\r\n", $mailHeaders));
         $smsResult = sendSmsNotification($brand['sms_to'], buildRequestSms($submission));
-        $formStatus = ($smsResult['sent'] || $mailSent) ? 'success' : 'delivery_error';
+        $formStatus = ($smsResult['sent'] && $mailSent) ? 'success' : 'delivery_error';
     } elseif ($errors) {
         $formStatus = 'error';
     }
@@ -567,12 +568,12 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 
                 <div class="form-panel">
                     <?php if ($formStatus === 'delivery_error'): ?>
-                        <div class="alert error">Your request was saved, but text/email delivery is not configured on this server. Please call us directly.</div>
+                        <div class="alert error">Your request was saved, but email or text message delivery failed. Please call us directly.</div>
                     <?php elseif ($formStatus === 'error'): ?>
                         <div class="alert error">Please fill in all required fields before sending your request.</div>
                     <?php endif; ?>
 
-                    <form method="post" action="#request" id="helpForm" novalidate>
+                    <form method="post" action="submit.php" id="helpForm" novalidate>
     <input type="text" name="website" tabindex="-1" autocomplete="off" class="honeypot" aria-hidden="true">
     
     <!-- قسم المعلومات الشخصية -->

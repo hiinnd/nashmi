@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use PHPMailer\PHPMailer\Exception as MailerException;
 use PHPMailer\PHPMailer\PHPMailer;
+use Twilio\Rest\Client as TwilioClient;
 
 function loadEnvFile(string $path): void
 {
@@ -111,6 +112,31 @@ function buildRequestEmail(array $submission, array $brand): string
     return implode(PHP_EOL, $lines);
 }
 
+function buildRequestSms(array $submission): string
+{
+    $lines = [
+        'New Nashmi roadside assistance request',
+        'Name: ' . ($submission['name'] ?: 'Not provided'),
+        'Phone: ' . ($submission['phone'] ?: 'Not provided'),
+        'Email: ' . ($submission['email'] ?: 'Not provided'),
+        'Vehicle: ' . ($submission['vehicle'] ?: 'Not provided'),
+        'VIN: ' . ($submission['vin'] ?: 'Not provided'),
+        'Service: ' . ($submission['service'] ?: 'Not provided'),
+    ];
+
+    if ($submission['service'] === 'Battery Replacement (on-site)') {
+        $lines[] = 'Appointment: ' . trim(($submission['appointment_date'] ?: 'Not selected') . ' ' . ($submission['appointment_time'] ?: ''));
+    }
+
+    $lines = array_merge($lines, [
+        'Location: ' . ($submission['location'] ?: 'Not provided'),
+        'Maps: ' . ($submission['maps_url'] ?: 'Not provided'),
+        'Notes: ' . ($submission['notes'] ?: 'No additional notes.'),
+    ]);
+
+    return implode("\n", $lines);
+}
+
 function sendEmailNotification(array $submission, array $brand): array
 {
     $requiredConfig = ['SMTP_HOST', 'SMTP_USERNAME', 'SMTP_PASSWORD', 'SMTP_PORT'];
@@ -166,6 +192,46 @@ function sendEmailNotification(array $submission, array $brand): array
     }
 }
 
+function sendSmsNotification(array $submission, array $brand): array
+{
+    $accountSid = envValue('TWILIO_ACCOUNT_SID');
+    $authToken = envValue('TWILIO_AUTH_TOKEN');
+    $fromNumber = envValue('TWILIO_FROM_NUMBER');
+    $toNumber = envValue('TWILIO_TO_NUMBER', $brand['sms_to']);
+
+    foreach ([
+        'TWILIO_ACCOUNT_SID' => $accountSid,
+        'TWILIO_AUTH_TOKEN' => $authToken,
+        'TWILIO_FROM_NUMBER' => $fromNumber,
+        'TWILIO_TO_NUMBER' => $toNumber,
+    ] as $key => $value) {
+        if ($value === '') {
+            $error = 'Missing SMS setting: ' . $key;
+            logDeliveryIssue('sms', ['to' => $toNumber ?: $brand['sms_to'], 'error' => $error]);
+            return ['sent' => false, 'error' => $error];
+        }
+    }
+
+    if (!class_exists(TwilioClient::class)) {
+        $error = 'Twilio SDK is not installed. Run composer install.';
+        logDeliveryIssue('sms', ['to' => $toNumber, 'error' => $error]);
+        return ['sent' => false, 'error' => $error];
+    }
+
+    try {
+        $client = new TwilioClient($accountSid, $authToken);
+        $message = $client->messages->create($toNumber, [
+            'from' => $fromNumber,
+            'body' => buildRequestSms($submission),
+        ]);
+
+        return ['sent' => true, 'error' => '', 'message_sid' => $message->sid ?? null];
+    } catch (Throwable $e) {
+        logDeliveryIssue('sms', ['to' => $toNumber, 'from' => $fromNumber, 'error' => $e->getMessage()]);
+        return ['sent' => false, 'error' => $e->getMessage()];
+    }
+}
+
 loadEnvFile(__DIR__ . DIRECTORY_SEPARATOR . '.env');
 
 if (in_array(strtolower(envValue('APP_DEBUG')), ['1', 'true', 'yes', 'on'], true)) {
@@ -187,6 +253,7 @@ $brand = [
     'name' => 'Nashmi',
     'email' => envValue('MAIL_TO_ADDRESS', 'nashmiroad@gmail.com'),
     'mail_from' => envValue('MAIL_FROM_ADDRESS', 'noreply@nashmi-road.com'),
+    'sms_to' => envValue('TWILIO_TO_NUMBER', '+19099926466'),
     'website_url' => 'https://www.nashmi-road.com/',
 ];
 
@@ -240,5 +307,6 @@ if (!is_dir($storage)) {
 file_put_contents($storage . DIRECTORY_SEPARATOR . 'requests.jsonl', json_encode($submission, JSON_UNESCAPED_SLASHES) . PHP_EOL, FILE_APPEND | LOCK_EX);
 
 $emailResult = sendEmailNotification($submission, $brand);
+$smsResult = sendSmsNotification($submission, $brand);
 
-redirectWithStatus($emailResult['sent'] ? 'success' : 'delivery_error');
+redirectWithStatus($emailResult['sent'] && $smsResult['sent'] ? 'success' : 'delivery_error');
